@@ -41,3 +41,15 @@ type PollVote struct {
 
 	VotedAt time.Time `gorm:"autoCreateTime"`
 }
+
+func (Poll) TableName() string {
+	return "messages_pools"
+}
+
+func (PollVote) TableName() string {
+	return "messages_pool_votes"
+}
+
+func (PollOption) TableName() string {
+	return "messages_pool_options"
+}

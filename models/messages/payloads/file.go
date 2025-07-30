@@ -14,3 +14,7 @@ type File struct {
 	Size        int64     `gorm:"not null"` // bytes
 	CreatedAt   time.Time
 }
+
+func (File) TableName() string {
+	return "messages_file"
+}

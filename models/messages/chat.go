@@ -23,3 +23,7 @@ type Chat struct {
 	Participants []ChatParticipant
 	Messages     []Message
 }
+
+func (Chat) TableName() string {
+	return "chats"
+}

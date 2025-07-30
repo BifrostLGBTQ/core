@@ -3,7 +3,7 @@ package db
 import (
 	"bifrost/models"
 	"bifrost/models/messages"
-	messagePayloads "bifrost/models/messages/payloads"
+	"bifrost/models/messages/payloads"
 
 	"fmt"
 	"log"
@@ -13,7 +13,6 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB // Global değişken olarak veritabanı bağlantısı
@@ -50,24 +49,37 @@ func InitDB() error {
 
 func Migrate(db *gorm.DB) error {
 	fmt.Println("Migration:Begin")
-	db.Logger = db.Logger.LogMode(logger.Silent)
+	//db.Logger = db.Logger.LogMode(logger.Silent)
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	db.Exec(`CREATE EXTENSION postgis;`)
 	return db.AutoMigrate(
 		&models.User{},
+
 		&models.Follow{},
 		&models.Like{},
 		&models.Block{},
 		&models.Favorite{},
 		&models.Match{},
 		&models.Media{},
-		&messages.Message{},
+
 		&messages.Chat{},
 		&messages.ChatParticipant{},
+
+		// payloads
+		&payloads.Gift{},
+		&payloads.Location{},
+		&payloads.File{},
+		&payloads.Poll{},
+		&payloads.PollOption{},
+		&payloads.PollVote{},
+		&payloads.GIF{},
+		&payloads.Photo{},
+		&payloads.Video{},
+		&payloads.Audio{},
+		&payloads.Sticker{},
+		&payloads.Call{},
+		// mesajlar en sonda
+		&messages.Message{},
 		&messages.MessageRead{},
-		&messagePayloads.Gift{},
-		&messagePayloads.Location{},
-		&messagePayloads.File{},
-		&messagePayloads.Poll{},
 	)
 }

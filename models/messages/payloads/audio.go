@@ -12,3 +12,7 @@ type Audio struct {
 	Duration  int       `gorm:"not null"`
 	CreatedAt time.Time
 }
+
+func (Audio) TableName() string {
+	return "messages_audio"
+}

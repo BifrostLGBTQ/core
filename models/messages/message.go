@@ -40,9 +40,14 @@ type Message struct {
 	Photo    *payloads.Photo    `gorm:"foreignKey:PayloadID;references:ID"`
 	Video    *payloads.Video    `gorm:"foreignKey:PayloadID;references:ID"`
 	Audio    *payloads.Audio    `gorm:"foreignKey:PayloadID;references:ID"`
-
-	Reads []MessageRead `gorm:"foreignKey:MessageID"`
+	Sticker  *payloads.Sticker  `gorm:"foreignKey:PayloadID;references:ID"`
+	Call     *payloads.Call     `gorm:"foreignKey:PayloadID;references:ID"`
+	Reads    []MessageRead      `gorm:"foreignKey:MessageID"`
 
 	CreatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+func (Message) TableName() string {
+	return "messages"
 }

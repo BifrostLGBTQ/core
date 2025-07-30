@@ -13,3 +13,7 @@ type Video struct {
 	Thumbnail string    `gorm:"size:512"` // küçük önizleme resmi URL'si
 	CreatedAt time.Time
 }
+
+func (Video) TableName() string {
+	return "messages_videos"
+}

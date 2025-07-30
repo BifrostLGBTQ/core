@@ -13,3 +13,7 @@ type Photo struct {
 	Height    int       `gorm:"not null"`
 	CreatedAt time.Time
 }
+
+func (Photo) TableName() string {
+	return "messages_photo"
+}

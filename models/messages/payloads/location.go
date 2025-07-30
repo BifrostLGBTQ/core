@@ -14,3 +14,7 @@ type Location struct {
 	Address   *string   `gorm:"size:256"`
 	CreatedAt time.Time
 }
+
+func (Location) TableName() string {
+	return "messages_location"
+}

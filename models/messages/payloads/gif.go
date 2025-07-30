@@ -14,3 +14,7 @@ type GIF struct {
 	Duration  int       `gorm:"not null"`          // animasyon süresi (saniye)
 	CreatedAt time.Time
 }
+
+func (GIF) TableName() string {
+	return "messages_gif"
+}

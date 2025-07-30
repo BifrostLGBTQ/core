@@ -14,3 +14,7 @@ type Gift struct {
 	Note       *string   `gorm:"size:256"`
 	CreatedAt  time.Time
 }
+
+func (Gift) TableName() string {
+	return "messages_gift"
+}

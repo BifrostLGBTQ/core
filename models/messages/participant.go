@@ -23,3 +23,7 @@ type ChatParticipant struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func (ChatParticipant) TableName() string {
+	return "messages_chat_participants"
+}

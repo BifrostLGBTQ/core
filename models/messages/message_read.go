@@ -17,3 +17,7 @@ type MessageRead struct {
 	Message Message
 	User    models.User
 }
+
+func (MessageRead) TableName() string {
+	return "messages_reads"
+}
