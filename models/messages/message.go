@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"bifrost/models"
-	"bifrost/models/messages/payloads"
+	"bifrost/models/messages/message_payloads"
 )
 
 type Message struct {
@@ -32,17 +32,17 @@ type Message struct {
 	ReplyTo       *Message `gorm:"foreignKey:ReplyToID"`
 	ForwardedFrom *models.User
 
-	Gift     *payloads.Gift     `gorm:"foreignKey:PayloadID;references:ID"`
-	Location *payloads.Location `gorm:"foreignKey:PayloadID;references:ID"`
-	File     *payloads.File     `gorm:"foreignKey:PayloadID;references:ID"`
-	Poll     *payloads.Poll     `gorm:"foreignKey:PayloadID;references:ID"`
-	GIF      *payloads.GIF      `gorm:"foreignKey:PayloadID;references:ID"`
-	Photo    *payloads.Photo    `gorm:"foreignKey:PayloadID;references:ID"`
-	Video    *payloads.Video    `gorm:"foreignKey:PayloadID;references:ID"`
-	Audio    *payloads.Audio    `gorm:"foreignKey:PayloadID;references:ID"`
-	Sticker  *payloads.Sticker  `gorm:"foreignKey:PayloadID;references:ID"`
-	Call     *payloads.Call     `gorm:"foreignKey:PayloadID;references:ID"`
-	Reads    []MessageRead      `gorm:"foreignKey:MessageID"`
+	Gift     *message_payloads.Gift     `gorm:"foreignKey:PayloadID;references:ID"`
+	Location *message_payloads.Location `gorm:"foreignKey:PayloadID;references:ID"`
+	File     *message_payloads.File     `gorm:"foreignKey:PayloadID;references:ID"`
+	Poll     *message_payloads.Poll     `gorm:"foreignKey:PayloadID;references:ID"`
+	GIF      *message_payloads.GIF      `gorm:"foreignKey:PayloadID;references:ID"`
+	Photo    *message_payloads.Photo    `gorm:"foreignKey:PayloadID;references:ID"`
+	Video    *message_payloads.Video    `gorm:"foreignKey:PayloadID;references:ID"`
+	Audio    *message_payloads.Audio    `gorm:"foreignKey:PayloadID;references:ID"`
+	Sticker  *message_payloads.Sticker  `gorm:"foreignKey:PayloadID;references:ID"`
+	Call     *message_payloads.Call     `gorm:"foreignKey:PayloadID;references:ID"`
+	Reads    []MessageRead              `gorm:"foreignKey:MessageID"`
 
 	CreatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`

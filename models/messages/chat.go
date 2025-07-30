@@ -14,8 +14,8 @@ type Chat struct {
 	Description *string   `gorm:"size:512"`
 	AvatarURL   *string
 	CreatorID   uuid.UUID  `gorm:"type:uuid;index;not null"` // UUID olmalı
-	PinnedMsgID *uuid.UUID // UUID pointer
-	PinnedMsg   *Message   `gorm:"foreignKey:PinnedMsgID"`
+	PinnedMsgID *uuid.UUID `gorm:"type:uuid"`                // BU SATIR ÖNEMLİ
+	PinnedMsg   *Message   `gorm:"foreignKey:PinnedMsgID;references:ID"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`

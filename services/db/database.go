@@ -3,7 +3,7 @@ package db
 import (
 	"bifrost/models"
 	"bifrost/models/messages"
-	"bifrost/models/messages/payloads"
+	message_payloads "bifrost/models/messages/message_payloads"
 
 	"fmt"
 	"log"
@@ -52,9 +52,9 @@ func Migrate(db *gorm.DB) error {
 	//db.Logger = db.Logger.LogMode(logger.Silent)
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	db.Exec(`CREATE EXTENSION postgis;`)
-	return db.AutoMigrate(
-		&models.User{},
 
+	err := db.AutoMigrate(
+		&models.User{},
 		&models.Follow{},
 		&models.Like{},
 		&models.Block{},
@@ -62,24 +62,32 @@ func Migrate(db *gorm.DB) error {
 		&models.Match{},
 		&models.Media{},
 
+		// öncelikle payload'lar
+		&message_payloads.Gift{},
+		&message_payloads.Location{},
+		&message_payloads.File{},
+		&message_payloads.Poll{},
+		&message_payloads.PollOption{},
+		&message_payloads.PollVote{},
+		&message_payloads.GIF{},
+		&message_payloads.Photo{},
+		&message_payloads.Video{},
+		&message_payloads.Audio{},
+		&message_payloads.Sticker{},
+		&message_payloads.Call{},
+
+		// sonra mesajlar
+		&messages.Message{},
 		&messages.Chat{},
 		&messages.ChatParticipant{},
-
-		// payloads
-		&payloads.Gift{},
-		&payloads.Location{},
-		&payloads.File{},
-		&payloads.Poll{},
-		&payloads.PollOption{},
-		&payloads.PollVote{},
-		&payloads.GIF{},
-		&payloads.Photo{},
-		&payloads.Video{},
-		&payloads.Audio{},
-		&payloads.Sticker{},
-		&payloads.Call{},
-		// mesajlar en sonda
-		&messages.Message{},
 		&messages.MessageRead{},
 	)
+
+	db.Exec(`
+  ALTER TABLE chats 
+  ADD CONSTRAINT fk_chats_pinned_msg 
+  FOREIGN KEY (pinned_msg_id) REFERENCES messages(id)
+`)
+
+	return err
 }

@@ -253,3 +253,39 @@ type User struct {
 	gorm.Model
 	jwt.StandardClaims
 }
+
+func (User) TableName() string {
+	return "users"
+}
+
+func (Media) TableName() string {
+	return "user_medias"
+}
+
+func (TravelPlan) TableName() string {
+	return "user_travel_plans"
+}
+
+func (FavoriteCity) TableName() string {
+	return "user_favorite_cities"
+}
+
+func (Block) TableName() string {
+	return "user_blocks"
+}
+
+func (Match) TableName() string {
+	return "user_matches"
+}
+
+func (Like) TableName() string {
+	return "user_likes"
+}
+
+func (Follow) TableName() string {
+	return "user_follows"
+}
+
+func (CountryVisit) TableName() string {
+	return "user_country_visits"
+}

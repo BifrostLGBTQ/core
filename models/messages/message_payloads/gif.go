@@ -1,4 +1,4 @@
-package payloads
+package message_payloads
 
 import (
 	"time"
