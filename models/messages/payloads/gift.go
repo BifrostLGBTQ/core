@@ -1,12 +1,16 @@
 package payloads
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Gift struct {
-	ID        uint   `gorm:"primaryKey"`
-	Name      string `gorm:"size:64"`
-	Emoji     string `gorm:"size:8"`
-	MediaURL  string `gorm:"size:256"` // Gif, video, sticker url olabilir
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ReceiverID uuid.UUID `gorm:"type:uuid;not null;index"` // Hediye alan kişi
+	Name       string    `gorm:"size:128;not null"`
+	Amount     int       `gorm:"not null"`
+	Note       *string   `gorm:"size:256"`
+	CreatedAt  time.Time
 }

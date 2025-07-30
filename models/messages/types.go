@@ -1,0 +1,33 @@
+package messages
+
+type MessageType string
+type ParticipantRole string
+type MessageStatus string
+type ChatType string
+
+const (
+	Text     MessageType = "text"
+	Image    MessageType = "image"
+	Video    MessageType = "video"
+	Audio    MessageType = "audio"
+	GIF      MessageType = "gif"
+	Sticker  MessageType = "sticker"
+	File     MessageType = "file"
+	Location MessageType = "location"
+	System   MessageType = "system"
+	Gift     MessageType = "gift"
+	Poll     MessageType = "poll"
+)
+
+const (
+	Pending   MessageStatus = "pending"
+	Delivered MessageStatus = "delivered"
+	Seen      MessageStatus = "seen"
+	Deleted   MessageStatus = "deleted"
+)
+
+const (
+	Private ChatType = "private"
+	Group   ChatType = "group"
+	Channel ChatType = "channel"
+)

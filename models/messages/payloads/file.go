@@ -1,13 +1,16 @@
 package payloads
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type File struct {
-	ID        uint   `gorm:"primaryKey"`
-	URL       string `gorm:"size:512;not null"`
-	FileType  string `gorm:"size:64"` // mime tipi veya türü
-	Size      int64
-	Name      string `gorm:"size:256"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID          uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	URL         string    `gorm:"not null"`
+	FileName    string    `gorm:"size:256"`
+	ContentType string    `gorm:"size:128"`
+	Size        int64     `gorm:"not null"` // bytes
+	CreatedAt   time.Time
 }
