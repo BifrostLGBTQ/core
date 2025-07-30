@@ -104,7 +104,7 @@ func (repo *UserRepositoryImpl) Register(w http.ResponseWriter, email, password,
 	newUser := &models.User{
 		Email:    email,
 		Password: hashed_pw,
-		Username: username,
+		UserName: username,
 	}
 	user, err = repo.CreateUser(newUser)
 

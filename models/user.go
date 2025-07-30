@@ -207,7 +207,8 @@ type PostGISPoint struct {
 type User struct {
 	ID                 uuid.UUID          `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	SocketID           *string            `json:"socket_id,omitempty"`
-	Username           string             `json:"username"`
+	UserName           string             `json:"username"`
+	DisplayName        string             `json:"displayname"`
 	Email              string             `json:"email"`
 	Password           string             `json:"-"` // gizli tutulmalı
 	ProfileImageURL    *string            `json:"profile_image_url,omitempty"`

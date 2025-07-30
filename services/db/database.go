@@ -2,6 +2,9 @@ package db
 
 import (
 	"bifrost/models"
+	"bifrost/models/messages"
+	messagePayloads "bifrost/models/messages/payloads"
+
 	"fmt"
 	"log"
 	"os"
@@ -58,5 +61,13 @@ func Migrate(db *gorm.DB) error {
 		&models.Favorite{},
 		&models.Match{},
 		&models.Media{},
+		&messages.Message{},
+		&messages.Chat{},
+		&messages.ChatParticipant{},
+		&messages.MessageRead{},
+		&messagePayloads.Gift{},
+		&messagePayloads.Location{},
+		&messagePayloads.File{},
+		&messagePayloads.Poll{},
 	)
 }
