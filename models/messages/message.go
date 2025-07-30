@@ -36,6 +36,10 @@ type Message struct {
 	Location *payloads.Location `gorm:"foreignKey:PayloadID;references:ID"`
 	File     *payloads.File     `gorm:"foreignKey:PayloadID;references:ID"`
 	Poll     *payloads.Poll     `gorm:"foreignKey:PayloadID;references:ID"`
+	GIF      *payloads.GIF      `gorm:"foreignKey:PayloadID;references:ID"`
+	Photo    *payloads.Photo    `gorm:"foreignKey:PayloadID;references:ID"`
+	Video    *payloads.Video    `gorm:"foreignKey:PayloadID;references:ID"`
+	Audio    *payloads.Audio    `gorm:"foreignKey:PayloadID;references:ID"`
 
 	Reads []MessageRead `gorm:"foreignKey:MessageID"`
 
