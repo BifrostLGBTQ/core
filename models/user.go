@@ -289,3 +289,7 @@ func (Follow) TableName() string {
 func (CountryVisit) TableName() string {
 	return "user_country_visits"
 }
+
+func (Favorite) TableName() string {
+	return "user_favorites"
+}

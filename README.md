@@ -110,6 +110,10 @@ The server will start on the port specified in your `.env` file.
 - **JWT** - JSON Web Token implementation
 - **CORS** - Cross-Origin Resource Sharing middleware
 
+
+## Known Errors
+- Chats.go PinnedMsg   *Message   `gorm:"foreignKey:PinnedMsgID;references:ID"`
+
 ## License
 
 [Add your license information here]

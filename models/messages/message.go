@@ -42,7 +42,9 @@ type Message struct {
 	Audio    *message_payloads.Audio    `gorm:"foreignKey:PayloadID;references:ID"`
 	Sticker  *message_payloads.Sticker  `gorm:"foreignKey:PayloadID;references:ID"`
 	Call     *message_payloads.Call     `gorm:"foreignKey:PayloadID;references:ID"`
-	Reads    []MessageRead              `gorm:"foreignKey:MessageID"`
+	System   *message_payloads.System   `gorm:"foreignKey:PayloadID;references:ID"`
+
+	Reads []MessageRead `gorm:"foreignKey:MessageID"`
 
 	CreatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`

@@ -75,7 +75,7 @@ func Migrate(db *gorm.DB) error {
 		&message_payloads.Audio{},
 		&message_payloads.Sticker{},
 		&message_payloads.Call{},
-
+		&message_payloads.System{},
 		// sonra mesajlar
 		&messages.Message{},
 		&messages.Chat{},
@@ -84,10 +84,20 @@ func Migrate(db *gorm.DB) error {
 	)
 
 	db.Exec(`
-  ALTER TABLE chats 
-  ADD CONSTRAINT fk_chats_pinned_msg 
-  FOREIGN KEY (pinned_msg_id) REFERENCES messages(id)
-`)
+	DO $$
+	BEGIN
+		IF NOT EXISTS (
+			SELECT 1 
+			FROM pg_constraint 
+			WHERE conname = 'fk_chats_pinned_msg'
+		) THEN
+			ALTER TABLE chats 
+			ADD CONSTRAINT fk_chats_pinned_msg 
+			FOREIGN KEY (pinned_msg_id) REFERENCES messages(id);
+		END IF;
+	END
+	$$;
+	`)
 
 	return err
 }
