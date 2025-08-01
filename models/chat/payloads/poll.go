@@ -1,4 +1,4 @@
-package message_payloads
+package payloads
 
 import (
 	"bifrost/models"

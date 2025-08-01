@@ -1,4 +1,4 @@
-package messages
+package chat
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"bifrost/models"
-	"bifrost/models/messages/message_payloads"
+	message_payloads "bifrost/models/chat/payloads"
 )
 
 type Message struct {

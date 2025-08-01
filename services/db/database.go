@@ -2,8 +2,8 @@ package db
 
 import (
 	"bifrost/models"
-	"bifrost/models/messages"
-	message_payloads "bifrost/models/messages/message_payloads"
+	"bifrost/models/chat"
+	message_payloads "bifrost/models/chat/payloads"
 
 	"fmt"
 	"log"
@@ -77,10 +77,10 @@ func Migrate(db *gorm.DB) error {
 		&message_payloads.Call{},
 		&message_payloads.System{},
 		// sonra mesajlar
-		&messages.Message{},
-		&messages.Chat{},
-		&messages.ChatParticipant{},
-		&messages.MessageRead{},
+		&chat.Message{},
+		&chat.Chat{},
+		&chat.ChatParticipant{},
+		&chat.MessageRead{},
 	)
 
 	db.Exec(`

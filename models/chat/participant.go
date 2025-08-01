@@ -1,4 +1,4 @@
-package messages
+package chat
 
 import (
 	"time"

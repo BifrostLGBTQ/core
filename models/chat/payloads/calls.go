@@ -1,5 +1,5 @@
 // payloads/call.go
-package message_payloads
+package payloads
 
 import (
 	"time"

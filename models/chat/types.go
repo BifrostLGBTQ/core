@@ -1,4 +1,4 @@
-package messages
+package chat
 
 type MessageType string
 type ParticipantRole string
