@@ -1,6 +1,30 @@
 package constants
 
+import "encoding/json"
+
+type CommandEnvelope struct {
+	Version string          `json:"version"` // "v1", "v2" gibi
+	Code    string          `json:"code"`    // "chat.send_gif" gibi
+	Payload json.RawMessage `json:"payload"` // tip bilinmiyor, sonra parse edilir
+}
+
 type TCommandTypes int
+
+const (
+	// AUTH
+	CMD_AUTH_LOGIN  = "auth.login"
+	CMD_AUTH_LOGOUT = "auth.logout"
+
+	// CHAT
+	CMD_CHAT_SEND_TEXT    = "chat.send_text"
+	CMD_CHAT_SEND_GIF     = "chat.send_gif"
+	CMD_CHAT_SEND_CALL    = "chat.send_call"
+	CMD_CHAT_SEND_STICKER = "chat.send_sticker"
+
+	// USER
+	CMD_USER_UPDATE_PROFILE = "user.update_profile"
+	CMD_USER_FETCH_PROFILE  = "user.fetch_profile"
+)
 
 const (
 	INVALID_COMMAND TCommandTypes = iota
