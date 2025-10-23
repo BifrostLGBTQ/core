@@ -1,11 +1,10 @@
 package chat
 
 import (
+	"bifrost/models/user"
 	"time"
 
 	"github.com/google/uuid"
-
-	"bifrost/models"
 )
 
 type MessageRead struct {
@@ -15,7 +14,7 @@ type MessageRead struct {
 	ReadAt    time.Time `gorm:"autoCreateTime"`
 
 	Message Message
-	User    models.User
+	User    user.User
 }
 
 func (MessageRead) TableName() string {

@@ -1,9 +1,11 @@
 package db
 
 import (
-	"bifrost/models"
 	"bifrost/models/chat"
 	message_payloads "bifrost/models/chat/payloads"
+	"bifrost/models/user"
+	user_payloads "bifrost/models/user/payloads"
+	seed "bifrost/seeders"
 
 	"fmt"
 	"log"
@@ -54,15 +56,21 @@ func Migrate(db *gorm.DB) error {
 	db.Exec(`CREATE EXTENSION postgis;`)
 
 	err := db.AutoMigrate(
-		&models.User{},
-		&models.Follow{},
-		&models.Like{},
-		&models.Block{},
-		&models.Favorite{},
-		&models.Match{},
-		&models.Media{},
+		// kullanıcı tabloları
+		&user.User{},
+		&user_payloads.SexualOrientation{},
+		&user_payloads.SexualOrientationTranslation{},
+		&user_payloads.Fantasy{},
+		&user_payloads.FantasyTranslation{},
+		&user_payloads.UserFantasy{},
+		&user.Follow{},
+		&user.Like{},
+		&user.Block{},
+		&user.Favorite{},
+		&user.Match{},
+		&user.Media{},
 
-		// öncelikle payload'lar
+		// Payload tabloları
 		&message_payloads.Gift{},
 		&message_payloads.Location{},
 		&message_payloads.File{},
@@ -76,9 +84,11 @@ func Migrate(db *gorm.DB) error {
 		&message_payloads.Sticker{},
 		&message_payloads.Call{},
 		&message_payloads.System{},
-		// sonra mesajlar
+
+		// önce Chat tablosu, sonra Message
 		&chat.Message{},
 		&chat.Chat{},
+
 		&chat.ChatParticipant{},
 		&chat.MessageRead{},
 	)
@@ -100,4 +110,14 @@ func Migrate(db *gorm.DB) error {
 	`)
 
 	return err
+}
+
+func Seed(db *gorm.DB) error {
+	fmt.Println("Seed Begin")
+
+	seed.SeedFantasies(db)
+	seed.SeedSexualOrientations(db)
+
+	fmt.Println("Seed End")
+	return nil
 }

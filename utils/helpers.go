@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"bifrost/models"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/hex"
@@ -35,6 +34,7 @@ import (
 	_ "golang.org/x/image/webp"
 
 	"bifrost/constants"
+	"bifrost/models/user"
 
 	"github.com/nfnt/resize"
 )
@@ -63,9 +63,9 @@ func DecodeGRPCMessages(jsonString string, data interface{}) {
 	}
 }
 
-func DecodeUserJWT(tokenString string) (*models.UserJWTClaims, error) {
+func DecodeUserJWT(tokenString string) (*user.UserJWTClaims, error) {
 	fmt.Println("DecodeUserJWT:Token:", tokenString)
-	token, err := jwt.ParseWithClaims(tokenString, &models.UserJWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &user.UserJWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
@@ -79,7 +79,7 @@ func DecodeUserJWT(tokenString string) (*models.UserJWTClaims, error) {
 		fmt.Println("DecodeUserJWT:Error:2")
 		return nil, errors.New("invalid jwt token")
 	}
-	myClaims, ok := token.Claims.(*models.UserJWTClaims)
+	myClaims, ok := token.Claims.(*user.UserJWTClaims)
 	if !ok {
 		fmt.Println("DecodeUserJWT:Error:3")
 		return nil, errors.New("couldn't parse token claims")
@@ -163,9 +163,9 @@ func Slugify(s string) string {
 	return slugText
 }
 
-func CheckAuthResponse(w http.ResponseWriter, r *http.Request) (*models.UserJWTClaims, error, int) {
+func CheckAuthResponse(w http.ResponseWriter, r *http.Request) (*user.UserJWTClaims, error, int) {
 
-	var decoded *models.UserJWTClaims
+	var decoded *user.UserJWTClaims
 	var err error
 	token := r.Header.Get("Authorization")
 	fmt.Println("TOKEN", token)

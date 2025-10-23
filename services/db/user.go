@@ -1,7 +1,7 @@
 package db
 
 import (
-	"bifrost/models"
+	models "bifrost/models/user"
 	"bifrost/utils"
 	"encoding/json"
 	"fmt"

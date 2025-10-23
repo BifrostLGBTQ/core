@@ -1,6 +1,7 @@
-package models
+package user
 
 import (
+	"bifrost/models/user/payloads"
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
@@ -25,7 +26,6 @@ type UserJWTClaims struct {
 
 type FollowStatus string
 type GenderIdentity string
-type SexualOrientation string
 type SexRole string
 type UserRole string
 type RelationshipStatus string
@@ -205,26 +205,27 @@ type PostGISPoint struct {
 }
 
 type User struct {
-	ID                 uuid.UUID          `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	SocketID           *string            `json:"socket_id,omitempty"`
-	UserName           string             `json:"username"`
-	DisplayName        string             `json:"displayname"`
-	Email              string             `json:"email"`
-	Password           string             `json:"-"` // gizli tutulmalı
-	ProfileImageURL    *string            `json:"profile_image_url,omitempty"`
-	Bio                *string            `json:"bio,omitempty"`
-	DateOfBirth        *time.Time         `json:"date_of_birth,omitempty"`
-	Gender             GenderIdentity     `json:"gender"`
-	SexualOrientation  SexualOrientation  `json:"sexual_orientation"`
-	RoleInSex          SexRole            `json:"sex_role"`
-	RelationshipStatus RelationshipStatus `json:"relationship_status"`
-	UserRole           UserRole           `json:"user_role"`
-	IsActive           bool               `json:"is_active"`
-	CreatedAt          time.Time          `json:"created_at"`
-	UpdatedAt          time.Time          `json:"updated_at"`
-	LastOnline         *time.Time         `json:"last_online,omitempty"`
-	Location           LocationData       `gorm:"type:jsonb" json:"location,omitempty"`
-	LocationPoint      PostGISPoint       `gorm:"type:geography(Point,4326)" json:"location_point"`
+	ID                  uuid.UUID                   `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	SocketID            *string                     `json:"socket_id,omitempty"`
+	UserName            string                      `json:"username"`
+	DisplayName         string                      `json:"displayname"`
+	Email               string                      `json:"email"`
+	Password            string                      `json:"-"` // gizli tutulmalı
+	ProfileImageURL     *string                     `json:"profile_image_url,omitempty"`
+	Bio                 *string                     `json:"bio,omitempty"`
+	DateOfBirth         *time.Time                  `json:"date_of_birth,omitempty"`
+	Gender              GenderIdentity              `json:"gender"`
+	SexualOrientation   *payloads.SexualOrientation `gorm:"foreignKey:SexualOrientationID" json:"sexual_orientation"`
+	SexualOrientationID *uuid.UUID                  `gorm:"type:uuid;index" json:"-"`
+	RoleInSex           SexRole                     `json:"sex_role"`
+	RelationshipStatus  RelationshipStatus          `json:"relationship_status"`
+	UserRole            UserRole                    `json:"user_role"`
+	IsActive            bool                        `json:"is_active"`
+	CreatedAt           time.Time                   `json:"created_at"`
+	UpdatedAt           time.Time                   `json:"updated_at"`
+	LastOnline          *time.Time                  `json:"last_online,omitempty"`
+	Location            LocationData                `gorm:"type:jsonb" json:"location,omitempty"`
+	LocationPoint       PostGISPoint                `gorm:"type:geography(Point,4326)" json:"location_point"`
 
 	// BDSM
 	BDSMInterest BDSMInterest `json:"bdsm_interest,omitempty"`
@@ -236,14 +237,15 @@ type User struct {
 
 	// Hobi ve Eğlence alanları (liste şeklinde)
 
-	Languages     pq.StringArray `gorm:"type:text[]" json:"languages"`
-	Hobbies       pq.StringArray `gorm:"type:text[]" json:"hobbies,omitempty"`
-	MoviesGenres  pq.StringArray `gorm:"type:text[]" json:"movies_genres,omitempty"`
-	TVShowsGenres pq.StringArray `gorm:"type:text[]" json:"tv_shows_genres,omitempty"`
-	TheaterGenres pq.StringArray `gorm:"type:text[]" json:"theater_genres,omitempty"`
-	CinemaGenres  pq.StringArray `gorm:"type:text[]" json:"cinema_genres,omitempty"`
-	ArtInterests  pq.StringArray `gorm:"type:text[]" json:"art_interests,omitempty"`
-	Entertainment pq.StringArray `gorm:"type:text[]" json:"entertainment,omitempty"`
+	Languages     pq.StringArray          `gorm:"type:text[]" json:"languages"`
+	Hobbies       pq.StringArray          `gorm:"type:text[]" json:"hobbies,omitempty"`
+	MoviesGenres  pq.StringArray          `gorm:"type:text[]" json:"movies_genres,omitempty"`
+	TVShowsGenres pq.StringArray          `gorm:"type:text[]" json:"tv_shows_genres,omitempty"`
+	TheaterGenres pq.StringArray          `gorm:"type:text[]" json:"theater_genres,omitempty"`
+	CinemaGenres  pq.StringArray          `gorm:"type:text[]" json:"cinema_genres,omitempty"`
+	ArtInterests  pq.StringArray          `gorm:"type:text[]" json:"art_interests,omitempty"`
+	Entertainment pq.StringArray          `gorm:"type:text[]" json:"entertainment,omitempty"`
+	Fantasies     []*payloads.UserFantasy `gorm:"foreignKey:UserID" json:"fantasies,omitempty"`
 
 	Travel TravelData `gorm:"embedded;embeddedPrefix:travel_" json:"travel"`
 	// 🔗 Sosyal İlişkiler

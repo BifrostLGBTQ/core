@@ -1,7 +1,7 @@
 package socket
 
 import (
-	"bifrost/models"
+	user "bifrost/models/user"
 	"bifrost/services/db"
 	"errors"
 	"fmt"
@@ -97,7 +97,7 @@ func (repo *SocketRepositoryImpl) BroadcastToRoom(namespace string, room string,
 
 func (repo *SocketRepositoryImpl) SendMessageToUser(userID uuid.UUID, event string, message string) error {
 	userRepo := &db.UserRepositoryImpl{DB: repo.DB}
-	user, err := userRepo.GetUser(&models.User{ID: userID})
+	user, err := userRepo.GetUser(&user.User{ID: userID})
 	if err != nil {
 		return errors.New("User not found")
 	}

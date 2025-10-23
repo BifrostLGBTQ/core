@@ -1,7 +1,7 @@
 package constants
 
 import (
-	"bifrost/models"
+	models "bifrost/models/user"
 )
 
 const (
@@ -22,21 +22,22 @@ const (
 	GenderQuestioning models.GenderIdentity = "questioning"
 	GenderX           models.GenderIdentity = "x"
 
-	OrientationGay         models.SexualOrientation = "gay"
-	OrientationLesbian     models.SexualOrientation = "lesbian"
-	OrientationBi          models.SexualOrientation = "bisexual"
-	OrientationPan         models.SexualOrientation = "pansexual"
-	OrientationAsexual     models.SexualOrientation = "asexual"
-	OrientationStraight    models.SexualOrientation = "straight"
-	OrientationOther       models.SexualOrientation = "other"
-	OrientationDemisexual  models.SexualOrientation = "demisexual"
-	OrientationQueer       models.SexualOrientation = "queer"
-	OrientationGraysexual  models.SexualOrientation = "graysexual"
-	OrientationQuestioning models.SexualOrientation = "questioning"
-	OrientationSapiosexual models.SexualOrientation = "sapiosexual"
-	OrientationAndrosexual models.SexualOrientation = "androsexual"
-	OrientationGynosexual  models.SexualOrientation = "gynosexual"
-
+	/*
+		OrientationGay         models.SexualOrientation = "gay"
+		OrientationLesbian     models.SexualOrientation = "lesbian"
+		OrientationBi          models.SexualOrientation = "bisexual"
+		OrientationPan         models.SexualOrientation = "pansexual"
+		OrientationAsexual     models.SexualOrientation = "asexual"
+		OrientationStraight    models.SexualOrientation = "straight"
+		OrientationOther       models.SexualOrientation = "other"
+		OrientationDemisexual  models.SexualOrientation = "demisexual"
+		OrientationQueer       models.SexualOrientation = "queer"
+		OrientationGraysexual  models.SexualOrientation = "graysexual"
+		OrientationQuestioning models.SexualOrientation = "questioning"
+		OrientationSapiosexual models.SexualOrientation = "sapiosexual"
+		OrientationAndrosexual models.SexualOrientation = "androsexual"
+		OrientationGynosexual  models.SexualOrientation = "gynosexual"
+	*/
 	// Relationship Status
 	StatusSingle       models.RelationshipStatus = "single"
 	StatusRelationship models.RelationshipStatus = "relationship"

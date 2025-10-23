@@ -35,15 +35,23 @@ func NewApp() (*App, error) {
 		}
 		instance = &App{
 			DB:     db.DB,
-			Router: routes.NewRouter(),
+			Router: routes.NewRouter(db.DB),
 			//WebSocketClientPool: ressocket.ConstructSocket(),
 			//RedisClient:         redis.ConstructRedis(),
 		}
 
-		err = db.Migrate(instance.DB)
-		if err != nil {
-			fmt.Println(err)
-		}
+		/*
+			err = db.Migrate(instance.DB)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			err = db.Seed(instance.DB)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+		*/
 
 	}
 

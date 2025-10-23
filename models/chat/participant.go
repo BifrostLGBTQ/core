@@ -1,11 +1,10 @@
 package chat
 
 import (
+	"bifrost/models/user"
 	"time"
 
 	"github.com/google/uuid"
-
-	"bifrost/models"
 )
 
 type ChatParticipant struct {
@@ -18,7 +17,7 @@ type ChatParticipant struct {
 	LeftAt   *time.Time
 
 	Chat Chat
-	User models.User
+	User user.User
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

@@ -6,8 +6,8 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"bifrost/models"
 	message_payloads "bifrost/models/chat/payloads"
+	"bifrost/models/user"
 )
 
 type Message struct {
@@ -27,10 +27,10 @@ type Message struct {
 	IsPinned    bool
 
 	// Relations
-	Chat          Chat
-	Sender        models.User
+	Chat          Chat `gorm:"foreignKey:ChatID;constraint:OnDelete:CASCADE"`
+	Sender        user.User
 	ReplyTo       *Message `gorm:"foreignKey:ReplyToID"`
-	ForwardedFrom *models.User
+	ForwardedFrom *user.User
 
 	Gift     *message_payloads.Gift     `gorm:"foreignKey:PayloadID;references:ID"`
 	Location *message_payloads.Location `gorm:"foreignKey:PayloadID;references:ID"`

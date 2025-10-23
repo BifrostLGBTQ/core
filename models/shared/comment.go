@@ -1,9 +1,8 @@
 package shared
 
 import (
+	"bifrost/models/user"
 	"time"
-
-	"bifrost/models" // kullanıcı modelinin yolu
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -38,7 +37,7 @@ type Comment struct {
 	DeletedAt  gorm.DeletedAt `gorm:"index"`
 
 	// Relations
-	Author       models.User          `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Author       user.User            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Parent       *Comment             `gorm:"foreignKey:ParentID;constraint:OnDelete:CASCADE"`
 	Replies      []Comment            `gorm:"foreignKey:ParentID;constraint:OnDelete:CASCADE"`
 	Interactions []CommentInteraction `gorm:"foreignKey:CommentID"`
@@ -54,8 +53,8 @@ type CommentInteraction struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
 	// Relations
-	User    models.User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
-	Comment Comment     `gorm:"foreignKey:CommentID;constraint:OnDelete:CASCADE"`
+	User    user.User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	Comment Comment   `gorm:"foreignKey:CommentID;constraint:OnDelete:CASCADE"`
 }
 
 func (Comment) TableName() string {

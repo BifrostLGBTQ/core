@@ -1,7 +1,7 @@
 package payloads
 
 import (
-	"bifrost/models"
+	"bifrost/models/user"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,7 +13,7 @@ type Poll struct {
 	ID                    uuid.UUID    `gorm:"type:uuid;primaryKey"`
 	Question              string       `gorm:"size:512;not null"`
 	CreatorID             uuid.UUID    `gorm:"type:uuid;not null;index"`
-	Creator               models.User  `gorm:"foreignKey:CreatorID"`
+	Creator               user.User    `gorm:"foreignKey:CreatorID"`
 	IsAnonymous           bool         `gorm:"default:false"` // Oy veren kullanıcılar gizli mi?
 	AllowsMultipleAnswers bool         `gorm:"default:false"` // Çoklu oy destekli mi?
 	Options               []PollOption `gorm:"foreignKey:PollID"`
@@ -36,8 +36,8 @@ type PollVote struct {
 	OptionID uuid.UUID  `gorm:"type:uuid;not null;index"`
 	Option   PollOption `gorm:"foreignKey:OptionID"`
 
-	UserID uuid.UUID   `gorm:"type:uuid;not null;index"`
-	User   models.User `gorm:"foreignKey:UserID"`
+	UserID uuid.UUID `gorm:"type:uuid;not null;index"`
+	User   user.User `gorm:"foreignKey:UserID"`
 
 	VotedAt time.Time `gorm:"autoCreateTime"`
 }
