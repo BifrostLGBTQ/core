@@ -73,6 +73,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
+github.com/twpayne/go-geom v1.6.1 h1:iLE+Opv0Ihm/ABIcvQFGIiFBXd76oBIar9drAwHFhR4=
+github.com/twpayne/go-geom v1.6.1/go.mod h1:Kr+Nly6BswFsKM5sd31YaoWS5PeDDH2NftJTK7Gd028=
 github.com/vchitai/go-socket.io/v4 v4.1.12 h1:bRn8esfN8SZU1FrFFS4gHVhkakJ5w9Mpr7QQSdSO9jI=
 github.com/vchitai/go-socket.io/v4 v4.1.12/go.mod h1:pA1VVlJsBQ/aKrcZzLLIwlhPATt9o1MLOQg78yoUkNM=
 github.com/zhouhui8915/engine.io-go v0.0.0-20150910083302-02ea08f0971f h1:tx1VqrLN1pol7xia95NVBbG09QHmMJjGvn67sR70qDA=

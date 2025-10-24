@@ -5,17 +5,21 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+
+	"gorm.io/gorm"
 )
 
 // ActionRouter maps action strings to handler functions
 type ActionRouter struct {
 	handlers map[string]func(http.ResponseWriter, *http.Request)
+	db       *gorm.DB
 }
 
 // NewActionRouter initializes a new ActionRouter
-func NewActionRouter() *ActionRouter {
+func NewActionRouter(db *gorm.DB) *ActionRouter {
 	return &ActionRouter{
 		handlers: make(map[string]func(http.ResponseWriter, *http.Request)),
+		db:       db,
 	}
 }
 

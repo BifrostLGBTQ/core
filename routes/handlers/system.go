@@ -35,12 +35,18 @@ type LanguageResponse struct {
 	Name string `json:"name"`
 }
 
+type OrientationData struct {
+	ID           string            `json:"id"`
+	Key          string            `json:"key"`
+	Translations map[string]string `json:"translations"`
+}
+
 // InitialData dönecek ana struct
 type InitialData struct {
-	Fantasies          map[string]FantasyResponse   `json:"fantasies"`
-	Countries          map[string]CountryResponse   `json:"countries"`
-	SexualOrientations map[string]map[string]string `json:"sexual_orientations"` // key -> {lang -> label}
-	Languages          map[string]LanguageResponse  `json:"languages"`
+	Fantasies          map[string]FantasyResponse  `json:"fantasies"`
+	Countries          map[string]CountryResponse  `json:"countries"`
+	SexualOrientations []OrientationData           `json:"sexual_orientations"` // key -> {lang -> label}
+	Languages          map[string]LanguageResponse `json:"languages"`
 
 	Status string `json:"status"`
 }
@@ -110,20 +116,25 @@ func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		orientationMap := make(map[string]map[string]string)
-		for _, o := range orientations {
+		var sexualOrientations []OrientationData
+		for _, o := range orientations { // DB’den gelen slice
 			translationMap := make(map[string]string)
 			for _, t := range o.Translations {
 				translationMap[t.Language] = t.Label
 			}
-			orientationMap[o.Key] = translationMap
+
+			sexualOrientations = append(sexualOrientations, OrientationData{
+				Key:          o.Key,
+				ID:           o.ID.String(),
+				Translations: translationMap,
+			})
 		}
 
 		// 5. InitialData hazırla
 		initialData := InitialData{
 			Fantasies:          fantasyMap,
 			Countries:          countries,
-			SexualOrientations: orientationMap,
+			SexualOrientations: sexualOrientations,
 			Languages:          languages,
 			Status:             "ok",
 		}

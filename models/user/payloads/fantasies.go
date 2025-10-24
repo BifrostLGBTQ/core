@@ -24,5 +24,17 @@ type UserFantasy struct {
 	FantasyID uuid.UUID `gorm:"type:uuid;index;not null"`
 	Notes     *string   `gorm:"type:text"`
 
-	Fantasy *Fantasy `gorm:"foreignKey:FantasyID"`
+	Fantasy *Fantasy `gorm:"foreignKey:FantasyID;references:ID" json:"fantasy,omitempty"`
+}
+
+func (UserFantasy) TableName() string {
+	return "user_fantasies"
+}
+
+func (FantasyTranslation) TableName() string {
+	return "fantasy_translations"
+}
+
+func (Fantasy) TableName() string {
+	return "fantasies"
 }

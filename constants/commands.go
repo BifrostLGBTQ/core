@@ -14,8 +14,10 @@ const (
 	//SYSTEM
 	CMD_INITIAL_SYNC = "system.initial_sync"
 	// AUTH
-	CMD_AUTH_LOGIN  = "auth.login"
-	CMD_AUTH_LOGOUT = "auth.logout"
+	CMD_AUTH_LOGIN    = "auth.login"
+	CMD_AUTH_REGISTER = "auth.register"
+	CMD_AUTH_LOGOUT   = "auth.logout"
+	CMD_AUTH_TEST     = "auth.test"
 
 	// CHAT
 	CMD_CHAT_SEND_TEXT    = "chat.send_text"

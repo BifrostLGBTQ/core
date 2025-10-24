@@ -40,18 +40,22 @@ func NewApp() (*App, error) {
 			//RedisClient:         redis.ConstructRedis(),
 		}
 
-		/*
+		var migrationEnabled = false
+		var seedEnabled = false
+
+		if migrationEnabled {
 			err = db.Migrate(instance.DB)
 			if err != nil {
 				fmt.Println(err)
 			}
+		}
 
+		if seedEnabled {
 			err = db.Seed(instance.DB)
 			if err != nil {
 				fmt.Println(err)
 			}
-
-		*/
+		}
 
 	}
 
