@@ -53,7 +53,7 @@ func Migrate(db *gorm.DB) error {
 	fmt.Println("Migration:Begin")
 	//db.Logger = db.Logger.LogMode(logger.Silent)
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
-	db.Exec(`CREATE EXTENSION postgis;`)
+	db.Exec(`CREATE EXTENSION IF NOT EXISTS postgis;`)
 
 	err := db.AutoMigrate(
 		// kullanıcı tabloları

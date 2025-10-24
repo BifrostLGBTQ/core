@@ -20,7 +20,10 @@ func NewTestHandler(service *services.UserService) *UserHandler {
 
 func HandleTestUser(s *services.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := "5cc2b7b1-844f-46b6-b30a-0fbbf6425598"
+
+		s.Test()
+
+		userID := "ce707772-f946-4ce3-9f89-e1fc091985f4"
 
 		uid, err := uuid.Parse(userID)
 		if err != nil {

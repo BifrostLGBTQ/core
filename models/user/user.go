@@ -1,12 +1,11 @@
 package user
 
 import (
+	"bifrost/extensions"
 	"bifrost/models/user/payloads"
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -201,38 +200,6 @@ type Media struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type PostGISPoint struct {
-	Lat float64
-	Lng float64
-}
-
-// DB'ye yazarken
-func (p PostGISPoint) Value() (driver.Value, error) {
-	return fmt.Sprintf("POINT(%f %f)", p.Lng, p.Lat), nil
-}
-
-// DB'den okurken
-func (p *PostGISPoint) Scan(src interface{}) error {
-	switch t := src.(type) {
-	case string:
-		// POINT(lng lat) formatı
-		t = strings.TrimPrefix(t, "POINT(")
-		t = strings.TrimSuffix(t, ")")
-		parts := strings.Split(t, " ")
-		if len(parts) != 2 {
-			return fmt.Errorf("invalid POINT string format")
-		}
-		fmt.Sscanf(parts[0], "%f", &p.Lng)
-		fmt.Sscanf(parts[1], "%f", &p.Lat)
-		return nil
-	case []byte:
-		// Eğer WKB gelirse, ST_AsText ile text'e çevrilebilir
-		return p.Scan(string(t))
-	default:
-		return fmt.Errorf("PostGISPoint: unknown type %T", src)
-	}
-}
-
 type User struct {
 	ID                  uuid.UUID                   `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	SocketID            *string                     `json:"socket_id,omitempty"`
@@ -254,7 +221,8 @@ type User struct {
 	UpdatedAt           time.Time                   `json:"updated_at"`
 	LastOnline          *time.Time                  `json:"last_online,omitempty"`
 	Location            LocationData                `gorm:"type:jsonb" json:"location,omitempty"`
-	LocationPoint       PostGISPoint                `gorm:"type:geography(Point,4326)" json:"location_point"`
+	LocationPoint       extensions.PostGISPoint     `gorm:"type:geography(Point,4326)" json:"location_point"`
+
 	// BDSM
 	BDSMInterest BDSMInterest `json:"bdsm_interest,omitempty"`
 	BDSMRole     BDSMRole     `json:"bdsm_role,omitempty"`

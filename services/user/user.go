@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bifrost/extensions"
 	"bifrost/helpers"
 	"bifrost/models/user"
 	"bifrost/models/user/payloads"
@@ -64,7 +65,7 @@ func (s *UserService) Register(form map[string][]string) (*user.User, string, er
 			Display:     form["body[location][display]"][0],
 			Timezone:    form["body[location][timezone]"][0],
 		},
-		LocationPoint: user.PostGISPoint{
+		LocationPoint: extensions.PostGISPoint{
 			Lat: lat,
 			Lng: lng,
 		},
@@ -109,21 +110,31 @@ func (s *UserService) Register(form map[string][]string) (*user.User, string, er
 			if err := s.repo.DB().Create(&userFantasies).Error; err != nil {
 				return nil, "", fmt.Errorf("failed to insert user fantasies: %w", err)
 			}
-
-			// userObj.Fantasies güncelle
-			userObj.Fantasies = userFantasies
 		}
 	}
 
+	userInfo, err := s.GetUserByID(userObj.ID)
+	if err != nil {
+		return nil, "", err
+	}
 	token, err := helpers.GenerateUserJWT(userObj.ID, userObj.Email)
 	if err != nil {
 		return nil, "", err
 	}
 
-	return userObj, token, nil
+	return userInfo, token, nil
 }
 
 // Kullanıcı ID ile getir
 func (s *UserService) GetUserByID(id uuid.UUID) (*user.User, error) {
 	return s.repo.GetByID(id)
+}
+
+// Register işlemi
+func (s *UserService) Test() {
+
+	if err := s.repo.TestUser(); err != nil {
+		return
+	}
+
 }
