@@ -11,12 +11,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func GenerateUserJWT(user_id uuid.UUID, nickname string) (string, error) {
+func GenerateUserJWT(user_id uuid.UUID, publicId int64) (string, error) {
 	var jwtSecret = []byte(os.Getenv("USER_JWT_SECRET"))
 
 	claims := jwt.MapClaims{
 		"user_id":  user_id,
-		"nickname": nickname,
+		"publicId": publicId,
 		"exp":      time.Now().AddDate(0, 0, 30).Unix(),
 		"version":  "0.1.2",
 	}

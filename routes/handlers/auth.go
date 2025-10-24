@@ -45,3 +45,47 @@ func HandleLogin(s *services.UserService) http.HandlerFunc {
 
 	}
 }
+
+/*
+
+func Follow(w http.ResponseWriter, r *http.Request) {
+	form := r.MultipartForm.Value
+	followerID := form["follower_id"]
+	followeeID := form["followee_id"]
+
+	if len(followerID) == 0 || len(followeeID) == 0 {
+		utils.SendError(w, http.StatusBadRequest, constants.ErrInvalidInput)
+		return
+	}
+
+	if err := h.service.Follow(followerID[0], followeeID[0]); err != nil {
+		utils.SendError(w, http.StatusBadRequest, constants.ErrDatabaseError)
+		return
+	}
+
+	utils.SendJSON(w, http.StatusOK, map[string]string{
+		"message": "User followed successfully",
+	})
+}
+
+func Unfollow(w http.ResponseWriter, r *http.Request) {
+	form := r.MultipartForm.Value
+	followerID := form["follower_id"]
+	followeeID := form["followee_id"]
+
+	if len(followerID) == 0 || len(followeeID) == 0 {
+		utils.SendError(w, http.StatusBadRequest, constants.ErrInvalidInput)
+		return
+	}
+
+	if err := h.service.Unfollow(followerID[0], followeeID[0]); err != nil {
+		utils.SendError(w, http.StatusBadRequest, constants.ErrDatabaseError)
+		return
+	}
+
+	utils.SendJSON(w, http.StatusOK, map[string]string{
+		"message": "User unfollowed successfully",
+	})
+}
+
+*/

@@ -12,6 +12,6 @@ type JWTClaims struct {
 
 type UserJWTClaims struct {
 	UserID   uuid.UUID `json:"user_id"`
-	nickname string
+	publicId int64     `json:"public_id"`
 	jwt.StandardClaims
 }

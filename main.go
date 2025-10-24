@@ -3,6 +3,7 @@ package main
 import (
 	"bifrost/routes"
 	"bifrost/services/db"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -40,21 +41,27 @@ func NewApp() (*App, error) {
 			//RedisClient:         redis.ConstructRedis(),
 		}
 
-		var migrationEnabled = true
-		var seedEnabled = false
+		migrateFlag := flag.Bool("migrate", false, "Run DB migrations")
+		seedFlag := flag.Bool("seed", false, "Run DB seed")
 
-		if migrationEnabled {
+		flag.Parse()
+
+		if *migrateFlag {
 			err = db.Migrate(instance.DB)
 			if err != nil {
 				fmt.Println(err)
 			}
+			os.Exit(0) // migration sonrası programdan çık
+
 		}
 
-		if seedEnabled {
+		if *seedFlag {
 			err = db.Seed(instance.DB)
 			if err != nil {
 				fmt.Println(err)
 			}
+			os.Exit(0) // seed sonrası programdan çık
+
 		}
 
 	}

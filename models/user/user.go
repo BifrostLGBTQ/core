@@ -185,6 +185,12 @@ type User struct {
 	Location            *LocationData                `gorm:"type:jsonb" json:"location,omitempty"`
 	LocationPoint       *extensions.PostGISPoint     `gorm:"type:geography(Point,4326)" json:"location_point"`
 
+	AvatarID *uuid.UUID `json:"avatar_id,omitempty"`
+	CoverID  *uuid.UUID `json:"cover_id,omitempty"`
+
+	Avatar *media.Media `gorm:"foreignKey:AvatarID" json:"avatar,omitempty"`
+	Cover  *media.Media `gorm:"foreignKey:CoverID" json:"cover,omitempty"`
+
 	// BDSM
 	BDSMInterest constants.BDSMInterest `json:"bdsm_interest,omitempty"`
 	BDSMRole     constants.BDSMRole     `json:"bdsm_role,omitempty"`

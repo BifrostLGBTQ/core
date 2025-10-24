@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bifrost/constants"
 	"bifrost/extensions"
 	"bifrost/helpers"
 	"bifrost/models/user"
@@ -123,7 +124,7 @@ func (s *UserService) Register(form map[string][]string) (*user.User, string, er
 	if err != nil {
 		return nil, "", err
 	}
-	token, err := helpers.GenerateUserJWT(userObj.ID, userObj.Email)
+	token, err := helpers.GenerateUserJWT(userObj.ID, userObj.PublicID)
 	if err != nil {
 		return nil, "", err
 	}
@@ -143,4 +144,38 @@ func (s *UserService) Test() {
 		return
 	}
 
+}
+
+func (s *UserService) Follow(followerID, followeeID string) error {
+	fID, err := uuid.Parse(followerID)
+	if err != nil {
+		return errors.New(constants.ErrInvalidInput.String())
+	}
+	feID, err := uuid.Parse(followeeID)
+	if err != nil {
+		return errors.New(constants.ErrInvalidInput.String())
+	}
+
+	if err := s.repo.Follow(fID, feID); err != nil {
+		return errors.New(err.Error())
+	}
+
+	return nil
+}
+
+func (s *UserService) Unfollow(followerID, followeeID string) error {
+	fID, err := uuid.Parse(followerID)
+	if err != nil {
+		return errors.New(constants.ErrInvalidInput.String())
+	}
+	feID, err := uuid.Parse(followeeID)
+	if err != nil {
+		return errors.New(constants.ErrInvalidInput.String())
+	}
+
+	if err := s.repo.Unfollow(fID, feID); err != nil {
+		return errors.New(err.Error())
+	}
+
+	return nil
 }

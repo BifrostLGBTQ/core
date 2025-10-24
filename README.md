@@ -56,6 +56,15 @@ go mod download
 go run main.go
 ```
 
+```bash
+go run main.go -migrate
+```
+
+
+```bash
+go run main.go -seed
+```
+
 ## Project Structure
 
 ```
