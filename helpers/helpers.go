@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"bifrost/models/user"
+	"bifrost/models/jwtclaims"
 	"errors"
 	"fmt"
 	"os"
@@ -27,9 +27,9 @@ func GenerateUserJWT(user_id uuid.UUID, nickname string) (string, error) {
 	return result, error
 }
 
-func DecodeUserJWT(tokenString string) (*user.UserJWTClaims, error) {
+func DecodeUserJWT(tokenString string) (*jwtclaims.UserJWTClaims, error) {
 	fmt.Println("DecodeUserJWT:Token:", tokenString)
-	token, err := jwt.ParseWithClaims(tokenString, &user.UserJWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwtclaims.UserJWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
@@ -43,7 +43,7 @@ func DecodeUserJWT(tokenString string) (*user.UserJWTClaims, error) {
 		fmt.Println("DecodeUserJWT:Error:2")
 		return nil, errors.New("invalid jwt token")
 	}
-	myClaims, ok := token.Claims.(*user.UserJWTClaims)
+	myClaims, ok := token.Claims.(*jwtclaims.UserJWTClaims)
 	if !ok {
 		fmt.Println("DecodeUserJWT:Error:3")
 		return nil, errors.New("couldn't parse token claims")

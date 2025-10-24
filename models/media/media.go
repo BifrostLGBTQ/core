@@ -1,0 +1,25 @@
+package media
+
+import (
+	"bifrost/models/shared"
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type Media struct {
+	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	FileID    uuid.UUID `gorm:"type:uuid;not null" json:"file_id"`  // FileMetadata referansı
+	OwnerID   uuid.UUID `gorm:"type:uuid;not null" json:"owner_id"` // Kullanıcı, post, blog, chat ID
+	OwnerType OwnerType `gorm:"type:varchar(20);not null" json:"owner_type"`
+	Role      MediaRole `gorm:"type:varchar(20);not null" json:"role"` // profile, cover, post, chat_image...
+	IsPublic  bool      `gorm:"default:true" json:"is_public"`         // Herkes görebilir mi?
+
+	File      shared.FileMetadata `gorm:"foreignKey:FileID;references:ID" json:"file"`
+	CreatedAt time.Time           `json:"created_at"`
+	UpdatedAt time.Time           `json:"updated_at"`
+}
+
+func (Media) TableName() string {
+	return "medias"
+}

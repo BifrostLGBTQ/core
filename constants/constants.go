@@ -1,122 +1,133 @@
 package constants
 
-import (
-	models "bifrost/models/user"
-)
+type FollowStatus string
+type GenderIdentity string
+type SexRole string
+type UserRole string
+type RelationshipStatus string
+type BDSMInterest string
+type BDSMRole string
+
+type ZodiacSign string
+
+type SmokingHabit string
+type DrinkingHabit string
+
+type TravelPurpose string
 
 const (
-	GenderMale        models.GenderIdentity = "male"
-	GenderFemale      models.GenderIdentity = "female"
-	GenderTransMale   models.GenderIdentity = "trans_male"
-	GenderTransFemale models.GenderIdentity = "trans_female"
-	GenderNonBinary   models.GenderIdentity = "non_binary"
-	GenderOther       models.GenderIdentity = "other"
-	GenderAgender     models.GenderIdentity = "agender"
-	GenderBigender    models.GenderIdentity = "bigender"
-	GenderGenderfluid models.GenderIdentity = "genderfluid"
-	GenderDemiboy     models.GenderIdentity = "demiboy"
-	GenderDemigirl    models.GenderIdentity = "demigirl"
-	GenderTwoSpirit   models.GenderIdentity = "two_spirit"
-	GenderNeutrois    models.GenderIdentity = "neutrois"
-	GenderIntersex    models.GenderIdentity = "intersex"
-	GenderQuestioning models.GenderIdentity = "questioning"
-	GenderX           models.GenderIdentity = "x"
+	GenderMale        GenderIdentity = "male"
+	GenderFemale      GenderIdentity = "female"
+	GenderTransMale   GenderIdentity = "trans_male"
+	GenderTransFemale GenderIdentity = "trans_female"
+	GenderNonBinary   GenderIdentity = "non_binary"
+	GenderOther       GenderIdentity = "other"
+	GenderAgender     GenderIdentity = "agender"
+	GenderBigender    GenderIdentity = "bigender"
+	GenderGenderfluid GenderIdentity = "genderfluid"
+	GenderDemiboy     GenderIdentity = "demiboy"
+	GenderDemigirl    GenderIdentity = "demigirl"
+	GenderTwoSpirit   GenderIdentity = "two_spirit"
+	GenderNeutrois    GenderIdentity = "neutrois"
+	GenderIntersex    GenderIdentity = "intersex"
+	GenderQuestioning GenderIdentity = "questioning"
+	GenderX           GenderIdentity = "x"
 
 	/*
-		OrientationGay         models.SexualOrientation = "gay"
-		OrientationLesbian     models.SexualOrientation = "lesbian"
-		OrientationBi          models.SexualOrientation = "bisexual"
-		OrientationPan         models.SexualOrientation = "pansexual"
-		OrientationAsexual     models.SexualOrientation = "asexual"
-		OrientationStraight    models.SexualOrientation = "straight"
-		OrientationOther       models.SexualOrientation = "other"
-		OrientationDemisexual  models.SexualOrientation = "demisexual"
-		OrientationQueer       models.SexualOrientation = "queer"
-		OrientationGraysexual  models.SexualOrientation = "graysexual"
-		OrientationQuestioning models.SexualOrientation = "questioning"
-		OrientationSapiosexual models.SexualOrientation = "sapiosexual"
-		OrientationAndrosexual models.SexualOrientation = "androsexual"
-		OrientationGynosexual  models.SexualOrientation = "gynosexual"
+		OrientationGay         SexualOrientation = "gay"
+		OrientationLesbian     SexualOrientation = "lesbian"
+		OrientationBi          SexualOrientation = "bisexual"
+		OrientationPan         SexualOrientation = "pansexual"
+		OrientationAsexual     SexualOrientation = "asexual"
+		OrientationStraight    SexualOrientation = "straight"
+		OrientationOther       SexualOrientation = "other"
+		OrientationDemisexual  SexualOrientation = "demisexual"
+		OrientationQueer       SexualOrientation = "queer"
+		OrientationGraysexual  SexualOrientation = "graysexual"
+		OrientationQuestioning SexualOrientation = "questioning"
+		OrientationSapiosexual SexualOrientation = "sapiosexual"
+		OrientationAndrosexual SexualOrientation = "androsexual"
+		OrientationGynosexual  SexualOrientation = "gynosexual"
 	*/
 	// Relationship Status
-	StatusSingle       models.RelationshipStatus = "single"
-	StatusRelationship models.RelationshipStatus = "relationship"
-	StatusMarriage     models.RelationshipStatus = "marriage"
-	StatusPartnership  models.RelationshipStatus = "partnership"
-	StatusInBetween    models.RelationshipStatus = "inbetween"
-	StatusIDK          models.RelationshipStatus = "idk"
-	StatusDivorced     models.RelationshipStatus = "divorced"
-	StatusWidowed      models.RelationshipStatus = "widowed"
-	StatusSeparated    models.RelationshipStatus = "separated"
-	StatusOpen         models.RelationshipStatus = "open"
-	StatusEngaged      models.RelationshipStatus = "engaged"
+	StatusSingle       RelationshipStatus = "single"
+	StatusRelationship RelationshipStatus = "relationship"
+	StatusMarriage     RelationshipStatus = "marriage"
+	StatusPartnership  RelationshipStatus = "partnership"
+	StatusInBetween    RelationshipStatus = "inbetween"
+	StatusIDK          RelationshipStatus = "idk"
+	StatusDivorced     RelationshipStatus = "divorced"
+	StatusWidowed      RelationshipStatus = "widowed"
+	StatusSeparated    RelationshipStatus = "separated"
+	StatusOpen         RelationshipStatus = "open"
+	StatusEngaged      RelationshipStatus = "engaged"
 
 	// BDSM Interest (İlgi)
-	BDSMInterestYes         models.BDSMInterest = "yes"
-	BDSMInterestNo          models.BDSMInterest = "no"
-	BDSMInterestCurious     models.BDSMInterest = "curious"
-	BDSMInterestExperienced models.BDSMInterest = "experienced"
-	BDSMInterestOther       models.BDSMInterest = "other"
+	BDSMInterestYes         BDSMInterest = "yes"
+	BDSMInterestNo          BDSMInterest = "no"
+	BDSMInterestCurious     BDSMInterest = "curious"
+	BDSMInterestExperienced BDSMInterest = "experienced"
+	BDSMInterestOther       BDSMInterest = "other"
 
 	// BDSM Roles (Roller)
-	BDSMRoleDominant   models.BDSMRole = "dominant"
-	BDSMRoleSubmissive models.BDSMRole = "submissive"
-	BDSMRoleSwitch     models.BDSMRole = "switch"
-	BDSMRoleMaster     models.BDSMRole = "master"
-	BDSMRoleSlave      models.BDSMRole = "slave"
-	BDSMRoleTop        models.BDSMRole = "top"
-	BDSMRoleBottom     models.BDSMRole = "bottom"
-	BDSMRoleNone       models.BDSMRole = "none"
+	BDSMRoleDominant   BDSMRole = "dominant"
+	BDSMRoleSubmissive BDSMRole = "submissive"
+	BDSMRoleSwitch     BDSMRole = "switch"
+	BDSMRoleMaster     BDSMRole = "master"
+	BDSMRoleSlave      BDSMRole = "slave"
+	BDSMRoleTop        BDSMRole = "top"
+	BDSMRoleBottom     BDSMRole = "bottom"
+	BDSMRoleNone       BDSMRole = "none"
 
-	RoleTop           models.SexRole = "top"
-	RoleBottom        models.SexRole = "bottom"
-	RoleVerse         models.SexRole = "verse"
-	RoleSide          models.SexRole = "side"
-	RoleNone          models.SexRole = "none"
-	RoleVersTop       models.SexRole = "vers-top"
-	RoleVersBottom    models.SexRole = "vers-bottom"
-	RoleServiceTop    models.SexRole = "service-top"
-	RoleServiceBottom models.SexRole = "service-bottom"
-	RoleDominant      models.SexRole = "dominant"
-	RoleSubmissive    models.SexRole = "submissive"
-	RoleSwitch        models.SexRole = "switch"
-	RoleBrat          models.SexRole = "brat"
-	RoleObserver      models.SexRole = "observer"
-	RoleExhibitionist models.SexRole = "exhibitionist"
+	RoleTop           SexRole = "top"
+	RoleBottom        SexRole = "bottom"
+	RoleVerse         SexRole = "verse"
+	RoleSide          SexRole = "side"
+	RoleNone          SexRole = "none"
+	RoleVersTop       SexRole = "vers-top"
+	RoleVersBottom    SexRole = "vers-bottom"
+	RoleServiceTop    SexRole = "service-top"
+	RoleServiceBottom SexRole = "service-bottom"
+	RoleDominant      SexRole = "dominant"
+	RoleSubmissive    SexRole = "submissive"
+	RoleSwitch        SexRole = "switch"
+	RoleBrat          SexRole = "brat"
+	RoleObserver      SexRole = "observer"
+	RoleExhibitionist SexRole = "exhibitionist"
 
-	ZodiacAries       models.ZodiacSign = "aries"       // Koç
-	ZodiacTaurus      models.ZodiacSign = "taurus"      // Boğa
-	ZodiacGemini      models.ZodiacSign = "gemini"      // İkizler
-	ZodiacCancer      models.ZodiacSign = "cancer"      // Yengeç
-	ZodiacLeo         models.ZodiacSign = "leo"         // Aslan
-	ZodiacVirgo       models.ZodiacSign = "virgo"       // Başak
-	ZodiacLibra       models.ZodiacSign = "libra"       // Terazi
-	ZodiacScorpio     models.ZodiacSign = "scorpio"     // Akrep
-	ZodiacSagittarius models.ZodiacSign = "sagittarius" // Yay
-	ZodiacCapricorn   models.ZodiacSign = "capricorn"   // Oğlak
-	ZodiacAquarius    models.ZodiacSign = "aquarius"    // Kova
-	ZodiacPisces      models.ZodiacSign = "pisces"      // Balık
-	ZodiacUnknown     models.ZodiacSign = "unknown"     // Bilinmiyor / Belirtilmemiş
+	ZodiacAries       ZodiacSign = "aries"       // Koç
+	ZodiacTaurus      ZodiacSign = "taurus"      // Boğa
+	ZodiacGemini      ZodiacSign = "gemini"      // İkizler
+	ZodiacCancer      ZodiacSign = "cancer"      // Yengeç
+	ZodiacLeo         ZodiacSign = "leo"         // Aslan
+	ZodiacVirgo       ZodiacSign = "virgo"       // Başak
+	ZodiacLibra       ZodiacSign = "libra"       // Terazi
+	ZodiacScorpio     ZodiacSign = "scorpio"     // Akrep
+	ZodiacSagittarius ZodiacSign = "sagittarius" // Yay
+	ZodiacCapricorn   ZodiacSign = "capricorn"   // Oğlak
+	ZodiacAquarius    ZodiacSign = "aquarius"    // Kova
+	ZodiacPisces      ZodiacSign = "pisces"      // Balık
+	ZodiacUnknown     ZodiacSign = "unknown"     // Bilinmiyor / Belirtilmemiş
 
-	SmokingNever        models.SmokingHabit = "never"
-	SmokingOccasionally models.SmokingHabit = "occasionally"
-	SmokingRegularly    models.SmokingHabit = "regularly"
-	SmokingTryingToQuit models.SmokingHabit = "trying_to_quit"
-	SmokingOther        models.SmokingHabit = "other"
+	SmokingNever        SmokingHabit = "never"
+	SmokingOccasionally SmokingHabit = "occasionally"
+	SmokingRegularly    SmokingHabit = "regularly"
+	SmokingTryingToQuit SmokingHabit = "trying_to_quit"
+	SmokingOther        SmokingHabit = "other"
 
-	DrinkingNever        models.DrinkingHabit = "never"
-	DrinkingOccasionally models.DrinkingHabit = "occasionally"
-	DrinkingRegularly    models.DrinkingHabit = "regularly"
-	DrinkingTryingToQuit models.DrinkingHabit = "trying_to_quit"
-	DrinkingOther        models.DrinkingHabit = "other"
+	DrinkingNever        DrinkingHabit = "never"
+	DrinkingOccasionally DrinkingHabit = "occasionally"
+	DrinkingRegularly    DrinkingHabit = "regularly"
+	DrinkingTryingToQuit DrinkingHabit = "trying_to_quit"
+	DrinkingOther        DrinkingHabit = "other"
 
-	UserRoleUser       models.UserRole = "user"
-	UserRoleModerator  models.UserRole = "moderator"
-	UserRoleAdmin      models.UserRole = "admin"
-	UserRoleSuperAdmin models.UserRole = "super_admin"
-	UserRoleBanned     models.UserRole = "banned"
-	UserRoleDeleted    models.UserRole = "deleted"
-	UserRolePending    models.UserRole = "pending"
-	UserRoleVerified   models.UserRole = "verified"
-	UserRoleUnverified models.UserRole = "unverified"
+	UserRoleUser       UserRole = "user"
+	UserRoleModerator  UserRole = "moderator"
+	UserRoleAdmin      UserRole = "admin"
+	UserRoleSuperAdmin UserRole = "super_admin"
+	UserRoleBanned     UserRole = "banned"
+	UserRoleDeleted    UserRole = "deleted"
+	UserRolePending    UserRole = "pending"
+	UserRoleVerified   UserRole = "verified"
+	UserRoleUnverified UserRole = "unverified"
 )

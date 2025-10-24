@@ -40,7 +40,7 @@ func NewApp() (*App, error) {
 			//RedisClient:         redis.ConstructRedis(),
 		}
 
-		var migrationEnabled = false
+		var migrationEnabled = true
 		var seedEnabled = false
 
 		if migrationEnabled {

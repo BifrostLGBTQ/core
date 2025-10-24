@@ -1,4 +1,4 @@
-package shared
+package comment
 
 import (
 	"bifrost/models/user"

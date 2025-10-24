@@ -49,13 +49,19 @@ func (s *UserService) Register(form map[string][]string) (*user.User, string, er
 		return nil, "", errors.New("invalid longitude")
 	}
 
+	node, err := helpers.NewNode(1)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create snowflake node: %w", err)
+	}
+
 	userObj := &user.User{
+		PublicID:            node.Generate().Int64(),
 		UserName:            form["body[name]"][0],
 		DisplayName:         form["body[nickname]"][0],
 		DateOfBirth:         &dateOfBirth,
 		SexualOrientationID: &orientation.ID,
 		SexualOrientation:   &orientation,
-		Location: user.LocationData{
+		Location: &user.LocationData{
 			CountryCode: form["body[location][country_code]"][0],
 			CountryName: form["body[location][country_name]"][0],
 			City:        form["body[location][city]"][0],
@@ -65,7 +71,7 @@ func (s *UserService) Register(form map[string][]string) (*user.User, string, er
 			Display:     form["body[location][display]"][0],
 			Timezone:    form["body[location][timezone]"][0],
 		},
-		LocationPoint: extensions.PostGISPoint{
+		LocationPoint: &extensions.PostGISPoint{
 			Lat: lat,
 			Lng: lng,
 		},

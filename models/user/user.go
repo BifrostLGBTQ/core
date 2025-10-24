@@ -1,7 +1,9 @@
 package user
 
 import (
+	"bifrost/constants"
 	"bifrost/extensions"
+	"bifrost/models/media"
 	"bifrost/models/user/payloads"
 	"database/sql/driver"
 	"encoding/json"
@@ -14,45 +16,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type JWTClaims struct {
-	Name string `json:"name"`
-	jwt.StandardClaims
-}
-
-type UserJWTClaims struct {
-	UserID   uuid.UUID `json:"user_id"`
-	nickname string
-	jwt.StandardClaims
-}
-
-type FollowStatus string
-type GenderIdentity string
-type SexRole string
-type UserRole string
-type RelationshipStatus string
-type BDSMInterest string
-type BDSMRole string
-
-type ZodiacSign string
-
-type SmokingHabit string
-type DrinkingHabit string
-
-type TravelPurpose string
-
 const (
-	FollowStatusFollowing FollowStatus = "following"
-	FollowStatusBlocked   FollowStatus = "blocked"
-	FollowStatusMuted     FollowStatus = "muted"
-	FollowStatusRequested FollowStatus = "requested"
+	FollowStatusFollowing constants.FollowStatus = "following"
+	FollowStatusBlocked   constants.FollowStatus = "blocked"
+	FollowStatusMuted     constants.FollowStatus = "muted"
+	FollowStatusRequested constants.FollowStatus = "requested"
 )
 
 // === FOLLOW ===
 type Follow struct {
-	ID         uuid.UUID    `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	FollowerID uuid.UUID    `gorm:"type:uuid;index;not null" json:"follower_id"`
-	FolloweeID uuid.UUID    `gorm:"type:uuid;index;not null" json:"followee_id"`
-	Status     FollowStatus `gorm:"type:varchar(20);default:'following';index" json:"status"`
+	ID         uuid.UUID              `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	FollowerID uuid.UUID              `gorm:"type:uuid;index;not null" json:"follower_id"`
+	FolloweeID uuid.UUID              `gorm:"type:uuid;index;not null" json:"followee_id"`
+	Status     constants.FollowStatus `gorm:"type:varchar(20);default:'following';index" json:"status"`
 
 	Follower *User `gorm:"foreignKey:FollowerID" json:"follower,omitempty"`
 	Followee *User `gorm:"foreignKey:FolloweeID" json:"followee,omitempty"`
@@ -174,62 +150,48 @@ type FavoriteCity struct {
 
 // Seyahat Planı
 type TravelPlan struct {
-	City        string        `json:"city"`     // Örn: "Barcelona"
-	Country     string        `json:"country"`  // Örn: "Spain"
-	ISOCode     string        `json:"iso_code"` // Örn: "ES"
-	StartDate   time.Time     `json:"start_date"`
-	EndDate     time.Time     `json:"end_date"`
-	Purpose     TravelPurpose `json:"purpose,omitempty"` // Enum: vacation, work, etc.
-	WithFriends bool          `json:"with_friends"`      // Yalnız mı gidiyor?
-	Notes       string        `json:"notes,omitempty"`
-	IsPublic    bool          `json:"is_public"` // Profilde gözükebilir mi?
-}
-
-type Media struct {
-	ID     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	UserID uuid.UUID `gorm:"type:uuid;index;not null" json:"user_id"` // Medya sahibi kullanıcı
-
-	URL       string `gorm:"type:text;not null" json:"url"`         // Medya dosyasının URL'si
-	Type      string `gorm:"type:varchar(20);not null" json:"type"` // "image", "video", vs.
-	IsProfile bool   `gorm:"default:false" json:"is_profile"`       // Profil fotoğrafı mı?
-	IsPublic  bool   `gorm:"default:true" json:"is_public"`         // Public fotoğrafı mı?
-
-	User *User `gorm:"foreignKey:UserID" json:"user,omitempty"` // User ilişkisi
-
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	City        string                  `json:"city"`     // Örn: "Barcelona"
+	Country     string                  `json:"country"`  // Örn: "Spain"
+	ISOCode     string                  `json:"iso_code"` // Örn: "ES"
+	StartDate   time.Time               `json:"start_date"`
+	EndDate     time.Time               `json:"end_date"`
+	Purpose     constants.TravelPurpose `json:"purpose,omitempty"` // Enum: vacation, work, etc.
+	WithFriends bool                    `json:"with_friends"`      // Yalnız mı gidiyor?
+	Notes       string                  `json:"notes,omitempty"`
+	IsPublic    bool                    `json:"is_public"` // Profilde gözükebilir mi?
 }
 
 type User struct {
-	ID                  uuid.UUID                   `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	SocketID            *string                     `json:"socket_id,omitempty"`
-	UserName            string                      `json:"username"`
-	DisplayName         string                      `json:"displayname"`
-	Email               string                      `json:"email"`
-	Password            string                      `json:"-"` // gizli tutulmalı
-	ProfileImageURL     *string                     `json:"profile_image_url,omitempty"`
-	Bio                 *string                     `json:"bio,omitempty"`
-	DateOfBirth         *time.Time                  `json:"date_of_birth,omitempty"`
-	Gender              GenderIdentity              `json:"gender"`
-	SexualOrientation   *payloads.SexualOrientation `gorm:"foreignKey:SexualOrientationID" json:"sexual_orientation"`
-	SexualOrientationID *uuid.UUID                  `gorm:"type:uuid;index" json:"-"`
-	RoleInSex           SexRole                     `json:"sex_role"`
-	RelationshipStatus  RelationshipStatus          `json:"relationship_status"`
-	UserRole            UserRole                    `json:"user_role"`
-	IsActive            bool                        `json:"is_active"`
-	CreatedAt           time.Time                   `json:"created_at"`
-	UpdatedAt           time.Time                   `json:"updated_at"`
-	LastOnline          *time.Time                  `json:"last_online,omitempty"`
-	Location            LocationData                `gorm:"type:jsonb" json:"location,omitempty"`
-	LocationPoint       extensions.PostGISPoint     `gorm:"type:geography(Point,4326)" json:"location_point"`
+	ID                  uuid.UUID                    `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	PublicID            int64                        `gorm:"uniqueIndex;not null" json:"public_id"`
+	SocketID            *string                      `json:"socket_id,omitempty"`
+	UserName            string                       `json:"username"`
+	DisplayName         string                       `json:"displayname"`
+	Email               string                       `json:"email"`
+	Password            string                       `json:"-"` // gizli tutulmalı
+	ProfileImageURL     *string                      `json:"profile_image_url,omitempty"`
+	Bio                 *string                      `json:"bio,omitempty"`
+	DateOfBirth         *time.Time                   `json:"date_of_birth,omitempty"`
+	Gender              constants.GenderIdentity     `json:"gender"`
+	SexualOrientation   *payloads.SexualOrientation  `gorm:"foreignKey:SexualOrientationID" json:"sexual_orientation"`
+	SexualOrientationID *uuid.UUID                   `gorm:"type:uuid;index" json:"-"`
+	RoleInSex           constants.SexRole            `json:"sex_role"`
+	RelationshipStatus  constants.RelationshipStatus `json:"relationship_status"`
+	UserRole            constants.UserRole           `json:"user_role"`
+	IsActive            bool                         `json:"is_active"`
+	CreatedAt           time.Time                    `json:"created_at"`
+	UpdatedAt           time.Time                    `json:"updated_at"`
+	LastOnline          *time.Time                   `json:"last_online,omitempty"`
+	Location            *LocationData                `gorm:"type:jsonb" json:"location,omitempty"`
+	LocationPoint       *extensions.PostGISPoint     `gorm:"type:geography(Point,4326)" json:"location_point"`
 
 	// BDSM
-	BDSMInterest BDSMInterest `json:"bdsm_interest,omitempty"`
-	BDSMRole     BDSMRole     `json:"bdsm_role,omitempty"`
+	BDSMInterest constants.BDSMInterest `json:"bdsm_interest,omitempty"`
+	BDSMRole     constants.BDSMRole     `json:"bdsm_role,omitempty"`
 
 	// Alkol ve Sigara kullanımı
-	Smoking  SmokingHabit  `json:"smoking,omitempty"`
-	Drinking DrinkingHabit `json:"drinking,omitempty"`
+	Smoking  constants.SmokingHabit  `json:"smoking,omitempty"`
+	Drinking constants.DrinkingHabit `json:"drinking,omitempty"`
 
 	// Hobi ve Eğlence alanları (liste şeklinde)
 
@@ -243,20 +205,15 @@ type User struct {
 	Entertainment pq.StringArray          `gorm:"type:text[]" json:"entertainment,omitempty"`
 	Fantasies     []*payloads.UserFantasy `gorm:"foreignKey:UserID" json:"fantasies,omitempty"`
 	Travel        TravelData              `gorm:"embedded;embeddedPrefix:travel_" json:"travel"`
-	// 🔗 Sosyal İlişkiler
+	//  Sosyal İlişkiler
 	SocialRelations SocialRelations `json:"social,omitempty" gorm:"embedded;embeddedPrefix:social_"`
-	Media           []*Media        `gorm:"foreignKey:UserID" json:"media,omitempty"` // Kullanıcının medya koleksiyonu
-
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	Media           []*media.Media  `gorm:"foreignKey:OwnerID;references:ID" json:"media,omitempty"`
+	DeletedAt       gorm.DeletedAt  `gorm:"index" json:"deleted_at,omitempty"`
 	jwt.StandardClaims
 }
 
 func (User) TableName() string {
 	return "users"
-}
-
-func (Media) TableName() string {
-	return "user_medias"
 }
 
 func (TravelPlan) TableName() string {

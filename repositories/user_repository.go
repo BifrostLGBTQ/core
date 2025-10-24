@@ -24,7 +24,7 @@ func (r *UserRepository) TestUser() error {
 	user := user.User{
 		UserName:    "testUser",
 		DisplayName: "testUser",
-		LocationPoint: extensions.PostGISPoint{
+		LocationPoint: &extensions.PostGISPoint{
 			Lng: 83.96632795978059,
 			Lat: 28.2052577611216,
 		},

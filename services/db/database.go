@@ -3,6 +3,8 @@ package db
 import (
 	"bifrost/models/chat"
 	message_payloads "bifrost/models/chat/payloads"
+	"bifrost/models/media"
+	"bifrost/models/shared"
 	"bifrost/models/user"
 	user_payloads "bifrost/models/user/payloads"
 	seed "bifrost/seeders"
@@ -68,7 +70,8 @@ func Migrate(db *gorm.DB) error {
 		&user.Block{},
 		&user.Favorite{},
 		&user.Match{},
-		&user.Media{},
+		&shared.FileMetadata{},
+		&media.Media{},
 
 		// Payload tabloları
 		&message_payloads.Gift{},
