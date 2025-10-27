@@ -3,8 +3,10 @@ package repositories
 import (
 	"bifrost/constants"
 	"bifrost/extensions"
+	global_shared "bifrost/models/shared"
 	"bifrost/models/user"
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -111,4 +113,56 @@ func (r *UserRepository) GetByID(userID uuid.UUID) (*user.User, error) {
 		return nil, err
 	}
 	return &u, nil
+}
+
+func (r *UserRepository) GetUserByPublicId(userID int64) (*user.User, error) {
+	var u user.User
+	err :=
+		r.db.
+			Preload("Fantasies.Fantasy.Translations").
+			Preload("Avatar").
+			Preload("Cover").
+			Preload("SexualOrientation").
+			Preload("Media").
+			Preload("SocialRelations.Follows").
+			Preload("SocialRelations.Followers").
+			Preload("SocialRelations.Likes").
+			Preload("SocialRelations.LikedBy").
+			Preload("SocialRelations.Matches").
+			Preload("SocialRelations.Favorites").
+			Preload("SocialRelations.FavoritedBy").
+			Preload("SocialRelations.BlockedUsers").
+			Preload("SocialRelations.BlockedByUsers").
+			First(&u, "public_id = ?", userID).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
+func (r *UserRepository) UpsertLocation(location *global_shared.Location) error {
+	if location.ID == uuid.Nil {
+		location.ID = uuid.New()
+	}
+
+	location.UpdatedAt = time.Now()
+	if location.CreatedAt.IsZero() {
+		location.CreatedAt = time.Now()
+	}
+
+	// Polymorphic owner_type + owner_id eşleşmesini kontrol et
+	var existing global_shared.Location
+	err := r.db.Where("contentable_type = ? AND contentable_id = ?", location.ContentableType, location.ContentableID).First(&existing).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Yeni ekle
+			return r.db.Create(location).Error
+		}
+		return err
+	}
+
+	// Güncelle
+	location.ID = existing.ID
+	return r.db.Model(&existing).Updates(location).Error
 }

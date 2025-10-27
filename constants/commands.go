@@ -28,6 +28,9 @@ const (
 	// USER
 	CMD_USER_UPDATE_PROFILE = "user.update_profile"
 	CMD_USER_FETCH_PROFILE  = "user.fetch_profile"
+
+	CMD_POST_CREATE = "post.create"
+	CMD_POST_GET    = "post.get"
 )
 
 /*

@@ -184,12 +184,13 @@ type User struct {
 	LastOnline          *time.Time                   `json:"last_online,omitempty"`
 	Location            *LocationData                `gorm:"type:jsonb" json:"location,omitempty"`
 	LocationPoint       *extensions.PostGISPoint     `gorm:"type:geography(Point,4326)" json:"location_point"`
+	DefaultLanguage     string                       `gorm:"type:varchar(8);default:'en'" json:"default_language"`
 
-	AvatarID *uuid.UUID `json:"avatar_id,omitempty"`
-	CoverID  *uuid.UUID `json:"cover_id,omitempty"`
+	AvatarID *uuid.UUID   `json:"avatar_id,omitempty"`
+	Avatar   *media.Media `gorm:"constraint:OnDelete:SET NULL;foreignKey:AvatarID;references:ID" json:"avatar,omitempty"`
 
-	Avatar *media.Media `gorm:"foreignKey:AvatarID" json:"avatar,omitempty"`
-	Cover  *media.Media `gorm:"foreignKey:CoverID" json:"cover,omitempty"`
+	CoverID *uuid.UUID   `json:"cover_id,omitempty"`
+	Cover   *media.Media `gorm:"constraint:OnDelete:SET NULL;foreignKey:CoverID;references:ID" json:"cover,omitempty"`
 
 	// BDSM
 	BDSMInterest constants.BDSMInterest `json:"bdsm_interest,omitempty"`
@@ -213,7 +214,7 @@ type User struct {
 	Travel        TravelData              `gorm:"embedded;embeddedPrefix:travel_" json:"travel"`
 	//  Sosyal İlişkiler
 	SocialRelations SocialRelations `json:"social,omitempty" gorm:"embedded;embeddedPrefix:social_"`
-	Media           []*media.Media  `gorm:"foreignKey:OwnerID;references:ID" json:"media,omitempty"`
+	Media           []*media.Media  `gorm:"polymorphic:Owner;polymorphicValue:user;constraint:OnDelete:CASCADE" json:"media,omitempty"`
 	DeletedAt       gorm.DeletedAt  `gorm:"index" json:"deleted_at,omitempty"`
 	jwt.StandardClaims
 }

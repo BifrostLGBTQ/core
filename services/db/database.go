@@ -2,11 +2,16 @@ package db
 
 import (
 	"bifrost/models/chat"
-	message_payloads "bifrost/models/chat/payloads"
 	"bifrost/models/media"
-	"bifrost/models/shared"
+	"bifrost/models/post"
 	"bifrost/models/user"
+
+	"bifrost/models/shared"
+
+	message_payloads "bifrost/models/chat/payloads"
+	post_payloads "bifrost/models/post/payloads"
 	user_payloads "bifrost/models/user/payloads"
+
 	seed "bifrost/seeders"
 
 	"fmt"
@@ -58,20 +63,34 @@ func Migrate(db *gorm.DB) error {
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS postgis;`)
 
 	err := db.AutoMigrate(
-		// kullanıcı tabloları
-		&user.User{},
-		&user_payloads.SexualOrientation{},
-		&user_payloads.SexualOrientationTranslation{},
+
+		&shared.FileMetadata{},
+
+		&media.Media{},
+
 		&user_payloads.Fantasy{},
 		&user_payloads.FantasyTranslation{},
+
+		&user_payloads.SexualOrientation{},
+		&user_payloads.SexualOrientationTranslation{},
+
+		&user.User{},
 		&user_payloads.UserFantasy{},
 		&user.Follow{},
 		&user.Like{},
 		&user.Block{},
 		&user.Favorite{},
 		&user.Match{},
-		&shared.FileMetadata{},
-		&media.Media{},
+
+		&post.Post{}, // Önce parent tablo
+		&post_payloads.Tag{},
+		&post_payloads.Poll{},       // Poll önce
+		&post_payloads.PollChoice{}, // child tablolar sonra
+		&post_payloads.PollVote{},
+		&post_payloads.Event{}, // Event tablosu artık Post tablosundan sonra
+		&post_payloads.EventAttendee{},
+
+		&shared.Location{},
 
 		// Payload tabloları
 		&message_payloads.Gift{},
@@ -96,21 +115,23 @@ func Migrate(db *gorm.DB) error {
 		&chat.MessageRead{},
 	)
 
-	db.Exec(`
-	DO $$
-	BEGIN
-		IF NOT EXISTS (
-			SELECT 1 
-			FROM pg_constraint 
-			WHERE conname = 'fk_chats_pinned_msg'
-		) THEN
-			ALTER TABLE chats 
-			ADD CONSTRAINT fk_chats_pinned_msg 
-			FOREIGN KEY (pinned_msg_id) REFERENCES messages(id);
-		END IF;
-	END
-	$$;
-	`)
+	/*
+		db.Exec(`
+		DO $$
+		BEGIN
+			IF NOT EXISTS (
+				SELECT 1
+				FROM pg_constraint
+				WHERE conname = 'fk_chats_pinned_msg'
+			) THEN
+				ALTER TABLE chats
+				ADD CONSTRAINT fk_chats_pinned_msg
+				FOREIGN KEY (pinned_msg_id) REFERENCES messages(id);
+			END IF;
+		END
+		$$;
+		`)
+	*/
 
 	return err
 }

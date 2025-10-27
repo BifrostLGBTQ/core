@@ -4,6 +4,7 @@ import (
 	"bifrost/constants"
 	services "bifrost/services/user"
 	"bifrost/utils"
+	"fmt"
 	"net/http"
 )
 
@@ -23,6 +24,7 @@ func HandleRegister(s *services.UserService) http.HandlerFunc {
 		}
 
 		form := r.MultipartForm.Value
+		fmt.Println("REGISTER:FORM", form)
 		userObj, token, err := s.Register(form)
 		if err != nil {
 			utils.SendError(w, http.StatusBadRequest, constants.ErrDatabaseError)

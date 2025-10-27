@@ -126,3 +126,18 @@ The server will start on the port specified in your `.env` file.
 ## License
 
 [Add your license information here]
+
+
+brew update
+brew install postgresql
+brew install postgis
+brew services start postgresql
+brew services list
+
+
+brew services start postgresql
+psql postgres
+
+ALTER ROLE postgres WITH PASSWORD 'TestTest!1453!';
+
+brew services restart postgresql

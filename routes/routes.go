@@ -3,6 +3,7 @@ package routes
 
 import (
 	"bifrost/constants"
+	"bifrost/middleware"
 	"bifrost/repositories"
 	"bifrost/router"
 	"bifrost/routes/handlers"
@@ -31,12 +32,29 @@ func NewRouter(db *gorm.DB) *Router {
 
 	// repository ve service oluştur
 	userRepo := repositories.NewUserRepository(r.db)
+	mediaRepo := repositories.NewMediaRepository(r.db)
+	postRepo := repositories.NewPostRepository(r.db)
+
 	userService := services.NewUserService(userRepo)
-	// Action register
+	postService := services.NewPostService(userRepo, postRepo, mediaRepo)
+
+	r.action.Register(constants.CMD_INITIAL_SYNC, handlers.HandleInitialSync(r.db)) // middleware yok
+
 	r.action.Register(constants.CMD_INITIAL_SYNC, handlers.HandleInitialSync(r.db))
+
+	// Action register
 	r.action.Register(constants.CMD_AUTH_REGISTER, handlers.HandleRegister(userService))
 	r.action.Register(constants.CMD_AUTH_LOGIN, handlers.HandleLogin(userService))
 	r.action.Register(constants.CMD_AUTH_TEST, handlers.HandleTestUser(userService))
+
+	// POST
+	//	r.action.Register(constants.CMD_POST_CREATE, middleware.AuthMiddleware(userRepo) handlers.HandleCreate(postService))
+	r.action.Register(
+		constants.CMD_POST_CREATE,
+		handlers.HandleCreate(postService),  // handler
+		middleware.AuthMiddleware(userRepo), // middleware
+	)
+	r.action.Register(constants.CMD_POST_GET, handlers.HandleGetByID(postService))
 
 	r.mux.HandleFunc("/", r.handlePacket)
 	r.mux.HandleFunc("/test", r.handlePacket)
@@ -46,15 +64,19 @@ func NewRouter(db *gorm.DB) *Router {
 
 	return r
 }
+
 func (r *Router) handlePacket(w http.ResponseWriter, req *http.Request) {
 	var action string
 
-	if req.Method == http.MethodGet {
+	switch req.Method {
+	case http.MethodGet:
 		// GET query parametrelerinden al
 		action = req.URL.Query().Get("action")
-	} else if req.Method == http.MethodPost {
-		// POST ise önce JSON deneyebiliriz
-		if strings.Contains(req.Header.Get("Content-Type"), "application/json") {
+
+	case http.MethodPost:
+		contentType := req.Header.Get("Content-Type")
+		if strings.Contains(contentType, "application/json") {
+			// JSON body
 			var packet struct {
 				Action string `json:"action"`
 			}
@@ -64,14 +86,15 @@ func (r *Router) handlePacket(w http.ResponseWriter, req *http.Request) {
 			}
 			action = packet.Action
 		} else {
-			// POST form / multipart
+			// Form / multipart
 			if err := req.ParseMultipartForm(8192 << 20); err != nil {
 				http.Error(w, "Could not parse form", http.StatusBadRequest)
 				return
 			}
 			action = req.FormValue("action")
 		}
-	} else {
+
+	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -82,13 +105,20 @@ func (r *Router) handlePacket(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	handler, ok := r.action.GetHandler(action)
+	route, ok := r.action.GetHandler(action)
 	if !ok {
 		http.Error(w, "Unknown action", http.StatusBadRequest)
 		return
 	}
 
-	handler(w, req)
+	// Middleware zincirini uygula
+	handler := route.Handler
+	for i := len(route.Middlewares) - 1; i >= 0; i-- {
+		handler = route.Middlewares[i](handler)
+	}
+
+	// Handler çalıştır
+	handler.ServeHTTP(w, req)
 }
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {

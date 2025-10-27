@@ -14,12 +14,14 @@ import (
 func GenerateUserJWT(user_id uuid.UUID, publicId int64) (string, error) {
 	var jwtSecret = []byte(os.Getenv("USER_JWT_SECRET"))
 
-	claims := jwt.MapClaims{
-		"user_id":  user_id,
-		"publicId": publicId,
-		"exp":      time.Now().AddDate(0, 0, 30).Unix(),
-		"version":  "0.1.2",
+	claims := &jwtclaims.UserJWTClaims{
+		UserID:   user_id,  // uuid.UUID
+		PublicID: publicId, // int64
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().AddDate(0, 0, 30).Unix(),
+		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, error := token.SignedString(jwtSecret)
@@ -48,6 +50,8 @@ func DecodeUserJWT(tokenString string) (*jwtclaims.UserJWTClaims, error) {
 		fmt.Println("DecodeUserJWT:Error:3")
 		return nil, errors.New("couldn't parse token claims")
 	}
+	fmt.Println("JWTUSER_SNOWFLAKE", myClaims.PublicID)
+	fmt.Println("JWTUSER_UUID", myClaims.UserID)
 	fmt.Println("DecodeUserJWT:Passed:1")
 	return myClaims, nil
 }

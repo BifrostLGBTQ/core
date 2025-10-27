@@ -18,6 +18,10 @@ type MediaRepository struct {
 	db *gorm.DB
 }
 
+func NewMediaRepository(db *gorm.DB) *MediaRepository {
+	return &MediaRepository{db: db}
+}
+
 func (r *MediaRepository) GenerateStoragePath(ownerID uuid.UUID, ownerType media.OwnerType, role media.MediaRole, filename string) string {
 	ext := strings.ToLower(filepath.Ext(filename))
 	id := uuid.New().String()
@@ -90,6 +94,8 @@ func (r *MediaRepository) AddMedia(db *gorm.DB, ownerID uuid.UUID, ownerType med
 	ext := filepath.Ext(file.Filename)
 	newFileName := fmt.Sprintf("%d_%s%s", time.Now().Unix(), uuid.New().String(), ext)
 	storagePath := r.GenerateStoragePath(ownerID, ownerType, role, newFileName)
+
+	fmt.Println("STORAGE PATH", storagePath)
 
 	if err := r.SaveUploadedFile(file, storagePath); err != nil {
 		return nil, err

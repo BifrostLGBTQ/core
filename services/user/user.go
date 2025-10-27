@@ -27,7 +27,7 @@ func NewUserService(repo *repositories.UserRepository) *UserService {
 // Register işlemi
 func (s *UserService) Register(form map[string][]string) (*user.User, string, error) {
 	// Orientation
-	orientationKey := form["body[orientation]"][0]
+	orientationKey := form["orientation"]
 	var orientation payloads.SexualOrientation
 	if err := s.repo.DB().Preload("Translations").
 		Where("id = ?", orientationKey).First(&orientation).Error; err != nil {
@@ -35,17 +35,19 @@ func (s *UserService) Register(form map[string][]string) (*user.User, string, er
 	}
 
 	// BirthDate
-	dateOfBirth, err := time.Parse("2006-01-02", form["body[birthDate]"][0])
+	dateOfBirth, err := time.Parse("2006-01-02", form["birthDate"][0])
 	if err != nil {
 		return nil, "", errors.New("invalid birthDate")
 	}
 
+	fmt.Println("ORIENTATION", orientationKey, "BITYH", dateOfBirth)
+
 	// Location
-	lat, err := strconv.ParseFloat(form["body[location][lat]"][0], 64)
+	lat, err := strconv.ParseFloat(form["location[lat]"][0], 64)
 	if err != nil {
 		return nil, "", errors.New("invalid latitude")
 	}
-	lng, err := strconv.ParseFloat(form["body[location][lng]"][0], 64)
+	lng, err := strconv.ParseFloat(form["location[lng]"][0], 64)
 	if err != nil {
 		return nil, "", errors.New("invalid longitude")
 	}
@@ -57,20 +59,20 @@ func (s *UserService) Register(form map[string][]string) (*user.User, string, er
 
 	userObj := &user.User{
 		PublicID:            node.Generate().Int64(),
-		UserName:            form["body[name]"][0],
-		DisplayName:         form["body[nickname]"][0],
+		UserName:            form["name"][0],
+		DisplayName:         form["nickname"][0],
 		DateOfBirth:         &dateOfBirth,
 		SexualOrientationID: &orientation.ID,
 		SexualOrientation:   &orientation,
 		Location: &user.LocationData{
-			CountryCode: form["body[location][country_code]"][0],
-			CountryName: form["body[location][country_name]"][0],
-			City:        form["body[location][city]"][0],
-			Region:      form["body[location][region]"][0],
+			CountryCode: form["location[country_code]"][0],
+			CountryName: form["location[country_name]"][0],
+			City:        form["location[city]"][0],
+			Region:      form["location[region]"][0],
 			Lat:         lat,
 			Lng:         lng,
-			Display:     form["body[location][display]"][0],
-			Timezone:    form["body[location][timezone]"][0],
+			Display:     form["location[display]"][0],
+			Timezone:    form["location[timezone]"][0],
 		},
 		LocationPoint: &extensions.PostGISPoint{
 			Lat: lat,
@@ -88,7 +90,7 @@ func (s *UserService) Register(form map[string][]string) (*user.User, string, er
 	if len(form) > 0 {
 		var fantasyIDs []uuid.UUID
 		for k, v := range form {
-			if strings.HasPrefix(k, "body[fantasies]") {
+			if strings.HasPrefix(k, "fantasies") {
 				for _, val := range v {
 					fantasyUUID, err := uuid.Parse(val)
 					if err != nil {
