@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"bifrost/helpers"
 	"bifrost/models/media"
 	"bifrost/models/shared"
 	"fmt"
@@ -95,7 +96,9 @@ func (r *MediaRepository) AddMedia(db *gorm.DB, ownerID uuid.UUID, ownerType med
 	newFileName := fmt.Sprintf("%d_%s%s", time.Now().Unix(), uuid.New().String(), ext)
 	storagePath := r.GenerateStoragePath(ownerID, ownerType, role, newFileName)
 
+	urlPath := fmt.Sprintf("%s%s", helpers.MD5Hash(storagePath), ext)
 	fmt.Println("STORAGE PATH", storagePath)
+	fmt.Println("URL PATH", urlPath)
 
 	if err := r.SaveUploadedFile(file, storagePath); err != nil {
 		return nil, err
@@ -111,7 +114,7 @@ func (r *MediaRepository) AddMedia(db *gorm.DB, ownerID uuid.UUID, ownerType med
 		IsPublic:  true,
 		File: shared.FileMetadata{
 			ID:          uuid.New(),
-			URL:         "/static/" + string(ownerType) + "/" + string(role) + "/" + newFileName,
+			URL:         urlPath,
 			StoragePath: storagePath,
 			MimeType:    file.Header.Get("Content-Type"),
 			Size:        file.Size,
@@ -133,7 +136,18 @@ func (r *MediaRepository) AddMedia(db *gorm.DB, ownerID uuid.UUID, ownerType med
 }
 
 // Helper
+
+func (r *MediaRepository) MakeSureDirectoryPathExists(path string) error {
+	dir := filepath.Dir(path)
+	return os.MkdirAll(dir, os.ModePerm)
+}
+
 func (r *MediaRepository) SaveUploadedFile(file *multipart.FileHeader, path string) error {
+
+	if err := r.MakeSureDirectoryPathExists(path); err != nil {
+		return err
+	}
+
 	src, err := file.Open()
 	if err != nil {
 		return err

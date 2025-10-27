@@ -4,10 +4,8 @@ import (
 	"bifrost/constants"
 	"bifrost/extensions"
 	"bifrost/models/media"
+	"bifrost/models/shared"
 	"bifrost/models/user/payloads"
-	"database/sql/driver"
-	"encoding/json"
-	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -107,30 +105,6 @@ type TravelData struct {
 	FavoritePlaces   pq.StringArray `gorm:"type:text[]" json:"favorite_places"` // opsiyonel
 }
 
-type LocationData struct {
-	CountryCode string  `json:"country_code"`       // Örn: "TR"
-	CountryName string  `json:"country_name"`       // Örn: "Türkiye"
-	City        string  `json:"city"`               // Örn: "İstanbul"
-	Region      string  `json:"region,omitempty"`   // Örn: "Marmara"
-	Lat         float64 `json:"lat"`                // Örn: 41.0082
-	Lng         float64 `json:"lng"`                // Örn: 28.9784
-	Timezone    string  `json:"timezone,omitempty"` // Örn: "Europe/Istanbul"
-	Display     string  `json:"display"`            // "İstanbul, Türkiye"
-}
-
-// PostgreSQL için jsonb serialize
-func (l LocationData) Value() (driver.Value, error) {
-	return json.Marshal(l)
-}
-
-func (l *LocationData) Scan(value interface{}) error {
-	bytes, ok := value.([]byte)
-	if !ok {
-		return errors.New("LocationData: scan failed, not []byte")
-	}
-	return json.Unmarshal(bytes, l)
-}
-
 // Ziyaret Edilen Ülkeler
 type CountryVisit struct {
 	ISOCode   string    `json:"iso_code"`             // Örn: "FR"
@@ -182,7 +156,7 @@ type User struct {
 	CreatedAt           time.Time                    `json:"created_at"`
 	UpdatedAt           time.Time                    `json:"updated_at"`
 	LastOnline          *time.Time                   `json:"last_online,omitempty"`
-	Location            *LocationData                `gorm:"type:jsonb" json:"location,omitempty"`
+	Location            *shared.Location             `gorm:"type:jsonb" json:"location,omitempty"`
 	LocationPoint       *extensions.PostGISPoint     `gorm:"type:geography(Point,4326)" json:"location_point"`
 	DefaultLanguage     string                       `gorm:"type:varchar(8);default:'en'" json:"default_language"`
 

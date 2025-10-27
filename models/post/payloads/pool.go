@@ -12,30 +12,30 @@ const (
 )
 
 type Poll struct {
-	ID              uuid.UUID `gorm:"type:uuid;primaryKey"`
-	PostID          uuid.UUID `gorm:"type:uuid;index;not null"` // Hangi posta ait
-	ContentableID   uuid.UUID
-	ContentableType string
-	Question        shared.LocalizedString `gorm:"type:jsonb"`
-	Duration        int                    `gorm:"default:0"` // Poll süresi (dakika/isteğe bağlı)
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	ID              uuid.UUID              `gorm:"type:uuid;primaryKey" json:"id"`
+	PostID          uuid.UUID              `gorm:"type:uuid;index;not null" json:"post_id"`
+	ContentableID   uuid.UUID              `json:"contentable_id"`
+	ContentableType string                 `json:"contentable_type"`
+	Question        shared.LocalizedString `gorm:"type:jsonb" json:"question"`
+	Duration        int                    `gorm:"default:0" json:"duration"`
+	CreatedAt       time.Time              `json:"created_at"`
+	UpdatedAt       time.Time              `json:"updated_at"`
 
-	Choices []PollChoice `gorm:"foreignKey:PollID;constraint:OnDelete:CASCADE"`
+	Choices []PollChoice `gorm:"foreignKey:PollID;constraint:OnDelete:CASCADE" json:"choices,omitempty"`
 }
 
 type PollChoice struct {
-	ID        uuid.UUID              `gorm:"type:uuid;primaryKey"`
-	PollID    uuid.UUID              `gorm:"type:uuid;index;not null"`
-	Label     shared.LocalizedString `gorm:"type:jsonb"` // {"en":"Yes","tr":"Evet"}
-	VoteCount int                    `gorm:"default:0"`
+	ID        uuid.UUID              `gorm:"type:uuid;primaryKey" json:"id"`
+	PollID    uuid.UUID              `gorm:"type:uuid;index;not null" json:"poll_id"`
+	Label     shared.LocalizedString `gorm:"type:jsonb" json:"label"`
+	VoteCount int                    `gorm:"default:0" json:"vote_count"`
 
-	Votes []PollVote `gorm:"foreignKey:ChoiceID;constraint:OnDelete:CASCADE"`
+	Votes []PollVote `gorm:"foreignKey:ChoiceID;constraint:OnDelete:CASCADE" json:"votes,omitempty"`
 }
 
 type PollVote struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey"`
-	ChoiceID  uuid.UUID `gorm:"type:uuid;index;not null"`
-	UserID    uuid.UUID `gorm:"type:uuid;index;not null"` // Oy veren kullanıcı
-	CreatedAt time.Time
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	ChoiceID  uuid.UUID `gorm:"type:uuid;index;not null" json:"choice_id"`
+	UserID    uuid.UUID `gorm:"type:uuid;index;not null" json:"user_id"`
+	CreatedAt time.Time `json:"created_at"`
 }

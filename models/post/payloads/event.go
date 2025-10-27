@@ -10,34 +10,30 @@ import (
 )
 
 type EventAttendee struct {
-	ID      uuid.UUID `gorm:"type:uuid;primaryKey"`
-	EventID uuid.UUID `gorm:"type:uuid;not null;index"`
-	UserID  uuid.UUID `gorm:"type:uuid;not null;index"`
+	ID      uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	EventID uuid.UUID `gorm:"type:uuid;not null;index" json:"event_id"`
+	UserID  uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
 
-	Status   string    `gorm:"size:32;default:'interested'"` // "going", "interested", "invited", "declined"
-	JoinedAt time.Time `gorm:"autoCreateTime"`
+	Status   string    `gorm:"size:32;default:'interested'" json:"status"` // "going", "interested", "invited", "declined"
+	JoinedAt time.Time `gorm:"autoCreateTime" json:"joined_at"`
 }
 
 type Event struct {
-	ID          uuid.UUID              `gorm:"type:uuid;primaryKey"`
-	PostID      uuid.UUID              `gorm:"type:uuid;uniqueIndex;not null"` // Post ile birebir ilişki
-	Title       shared.LocalizedString `gorm:"type:jsonb"`
-	Description shared.LocalizedString `gorm:"type:jsonb"`
-	StartTime   *time.Time
-	EndTime     *time.Time
+	ID          uuid.UUID              `gorm:"type:uuid;primaryKey" json:"id"`
+	PostID      uuid.UUID              `gorm:"type:uuid;uniqueIndex;not null" json:"post_id"`
+	Title       shared.LocalizedString `gorm:"type:jsonb" json:"title"`
+	Description shared.LocalizedString `gorm:"type:jsonb" json:"description"`
+	StartTime   *time.Time             `json:"start_time,omitempty"`
+	EndTime     *time.Time             `json:"end_time,omitempty"`
 
-	// location
-	LocationID *uuid.UUID `gorm:"type:uuid"`
-	//Location   *global_shared.Location `gorm:"foreignKey:OwnerID;references:ID;->;constraint:OnDelete:SET NULL"`
-	Location *global_shared.Location `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE"`
+	LocationID *uuid.UUID              `gorm:"type:uuid" json:"location_id,omitempty"`
+	Location   *global_shared.Location `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"location,omitempty"`
+	Type       string                  `gorm:"size:64;index" json:"type"`
+	Attendees  []EventAttendee         `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE" json:"attendees,omitempty"`
 
-	Type string `gorm:"size:64;index"`
-
-	Attendees []EventAttendee `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE"`
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time `gorm:"index"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `gorm:"index" json:"deleted_at,omitempty"`
 }
 
 func (Event) TableName() string {

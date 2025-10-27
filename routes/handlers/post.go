@@ -27,9 +27,9 @@ func HandleCreate(s *services.PostService) http.HandlerFunc {
 			return
 		}
 
-		formParams := r.MultipartForm.Value          // text fields
-		images := r.MultipartForm.File["[images][]"] // images array
-		videos := r.MultipartForm.File["[videos][]"] // videos array
+		formParams := r.MultipartForm.Value        // text fields
+		images := r.MultipartForm.File["images[]"] // images array
+		videos := r.MultipartForm.File["videos[]"] // videos array
 
 		files := append([]*multipart.FileHeader{}, images...)
 		files = append(files, videos...)

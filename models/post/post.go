@@ -44,34 +44,35 @@ const (
 )
 
 type Post struct {
-	ID       uuid.UUID  `gorm:"type:uuid;primaryKey"`
-	ParentID *uuid.UUID `gorm:"type:uuid;index"`
-	Children []Post     `gorm:"foreignKey:ParentID"` // alt postlar
-	// Parent post, optional
-	PublicID int64 `gorm:"uniqueIndex;not null" json:"public_id"` //snowflake
+	ID       uuid.UUID  `gorm:"type:uuid;primaryKey" json:"id"`
+	ParentID *uuid.UUID `gorm:"type:uuid;index" json:"parent_id,omitempty"`
+	Children []Post     `gorm:"foreignKey:ParentID" json:"children,omitempty"`
+
+	PublicID int64 `gorm:"uniqueIndex;not null" json:"public_id"`
 
 	AuthorID uuid.UUID `gorm:"type:uuid;index;not null" json:"author_id"`
-	Type     PostType  `gorm:"size:50;not null;index"`
+	Type     PostType  `gorm:"size:50;not null;index" json:"type"`
 
-	Title   *string                 `gorm:"size:255"`             // optional
-	Slug    *string                 `gorm:"size:255;uniqueIndex"` // optional
-	Content *shared.LocalizedString `gorm:"type:jsonb"`           // optional {"en":"Hello","tr":"Merhaba"}
-	Summary *shared.LocalizedString `gorm:"type:jsonb"`           // optional {"en":"Short desc","tr":"Kısa açıklama"}
+	Title   *string                 `gorm:"size:255" json:"title,omitempty"`
+	Slug    *string                 `gorm:"size:255;uniqueIndex" json:"slug,omitempty"`
+	Content *shared.LocalizedString `gorm:"type:jsonb" json:"content,omitempty"`
+	Summary *shared.LocalizedString `gorm:"type:jsonb" json:"summary,omitempty"`
 
-	Published   bool       `gorm:"default:false;index"`
-	PublishedAt *time.Time `gorm:"index"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt  `gorm:"index"`
-	Extras      *map[string]any `gorm:"type:jsonb"` // Universal flexible extra fields
-	Author      user.User       `gorm:"foreignKey:AuthorID;references:ID"`
-	Tags        []payloads.Tag  `gorm:"many2many:post_tags;"`
-	Attachments []*media.Media  `gorm:"polymorphic:Owner;polymorphicValue:post;constraint:OnDelete:CASCADE" json:"media,omitempty"`
+	Published   bool           `gorm:"default:false;index" json:"published"`
+	PublishedAt *time.Time     `gorm:"index" json:"published_at,omitempty"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 
-	Poll  *payloads.Poll  `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE"`
-	Event *payloads.Event `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE"` // One-to-one event
+	Extras *map[string]any `gorm:"type:jsonb" json:"extras,omitempty"`
 
-	Location *global_shared.Location `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE"`
+	Author      user.User      `gorm:"foreignKey:AuthorID;references:ID" json:"author"`
+	Tags        []payloads.Tag `gorm:"many2many:post_tags;" json:"tags,omitempty"`
+	Attachments []*media.Media `gorm:"polymorphic:Owner;polymorphicValue:post;constraint:OnDelete:CASCADE" json:"attachments,omitempty"`
+
+	Poll     *payloads.Poll          `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"poll,omitempty"`
+	Event    *payloads.Event         `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE" json:"event,omitempty"`
+	Location *global_shared.Location `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"location,omitempty"`
 }
 
 func (Post) TableName() string {
