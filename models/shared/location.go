@@ -2,9 +2,6 @@ package shared
 
 import (
 	"bifrost/extensions"
-	"database/sql/driver"
-	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -39,21 +36,22 @@ type Location struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 }
 
-func (l *Location) Scan(value interface{}) error {
-	if value == nil {
-		return nil
+/*
+	func (l *Location) Scan(value interface{}) error {
+		if value == nil {
+			return nil
+		}
+		bytes, ok := value.([]byte)
+		if !ok {
+			return fmt.Errorf("failed to unmarshal JSONB value: %v", value)
+		}
+		return json.Unmarshal(bytes, l)
 	}
-	bytes, ok := value.([]byte)
-	if !ok {
-		return fmt.Errorf("failed to unmarshal JSONB value: %v", value)
+
+	func (l Location) Value() (driver.Value, error) {
+		return json.Marshal(l)
 	}
-	return json.Unmarshal(bytes, l)
-}
-
-func (l Location) Value() (driver.Value, error) {
-	return json.Marshal(l)
-}
-
+*/
 func (Location) TableName() string {
 	return "locations"
 }

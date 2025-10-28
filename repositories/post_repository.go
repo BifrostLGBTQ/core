@@ -83,11 +83,11 @@ func (r *PostRepository) GetPostByID(id uuid.UUID) (*post.Post, error) {
 	var p post.Post
 
 	err := r.db.
+		Preload("Location").
 		Preload("Poll").
 		Preload("Poll.Choices").
 		Preload("Event").
 		Preload("Event.Location").
-		Preload("Location").
 		Preload("Author").
 		Preload("Tags").
 		Preload("Attachments").

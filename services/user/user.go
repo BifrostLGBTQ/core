@@ -119,8 +119,6 @@ func (s *UserService) Register(request map[string][]string) (*user.User, string,
 		DateOfBirth:         &dateOfBirth,
 		SexualOrientationID: &orientation.ID,
 		SexualOrientation:   &orientation,
-		Location:            locationUser,
-		LocationPoint:       locationPoint,
 	}
 
 	if err := s.repo.Create(userObj); err != nil {

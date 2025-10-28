@@ -2,7 +2,6 @@ package user
 
 import (
 	"bifrost/constants"
-	"bifrost/extensions"
 	"bifrost/models/media"
 	"bifrost/models/shared"
 	"bifrost/models/user/payloads"
@@ -156,9 +155,9 @@ type User struct {
 	CreatedAt           time.Time                    `json:"created_at"`
 	UpdatedAt           time.Time                    `json:"updated_at"`
 	LastOnline          *time.Time                   `json:"last_online,omitempty"`
-	Location            *shared.Location             `gorm:"type:jsonb" json:"location,omitempty"`
-	LocationPoint       *extensions.PostGISPoint     `gorm:"type:geography(Point,4326)" json:"location_point"`
-	DefaultLanguage     string                       `gorm:"type:varchar(8);default:'en'" json:"default_language"`
+	Location            *shared.Location             `gorm:"polymorphic:Contentable;polymorphicValue:user;constraint:OnDelete:CASCADE" json:"location,omitempty"`
+
+	DefaultLanguage string `gorm:"type:varchar(8);default:'en'" json:"default_language"`
 
 	AvatarID *uuid.UUID   `json:"avatar_id,omitempty"`
 	Avatar   *media.Media `gorm:"constraint:OnDelete:SET NULL;foreignKey:AvatarID;references:ID" json:"avatar,omitempty"`

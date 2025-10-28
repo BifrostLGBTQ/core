@@ -25,11 +25,11 @@ type Event struct {
 	Description shared.LocalizedString `gorm:"type:jsonb" json:"description"`
 	StartTime   *time.Time             `json:"start_time,omitempty"`
 	EndTime     *time.Time             `json:"end_time,omitempty"`
+	//	Location    *global_shared.Location `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"location,omitempty"`
+	Location *global_shared.Location `gorm:"polymorphic:Contentable;polymorphicValue:event;constraint:OnDelete:CASCADE" json:"location,omitempty"`
 
-	LocationID *uuid.UUID              `gorm:"type:uuid" json:"location_id,omitempty"`
-	Location   *global_shared.Location `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"location,omitempty"`
-	Type       string                  `gorm:"size:64;index" json:"type"`
-	Attendees  []EventAttendee         `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE" json:"attendees,omitempty"`
+	Type      string          `gorm:"size:64;index" json:"type"`
+	Attendees []EventAttendee `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE" json:"attendees,omitempty"`
 
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`

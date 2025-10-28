@@ -53,7 +53,7 @@ type Post struct {
 	AuthorID uuid.UUID `gorm:"type:uuid;index;not null" json:"author_id"`
 	Type     PostType  `gorm:"size:50;not null;index" json:"type"`
 
-	Title   *string                 `gorm:"size:255" json:"title,omitempty"`
+	Title   *shared.LocalizedString `gorm:"type:jsonb" json:"title,omitempty"`
 	Slug    *string                 `gorm:"size:255;uniqueIndex" json:"slug,omitempty"`
 	Content *shared.LocalizedString `gorm:"type:jsonb" json:"content,omitempty"`
 	Summary *shared.LocalizedString `gorm:"type:jsonb" json:"summary,omitempty"`
@@ -70,9 +70,10 @@ type Post struct {
 	Tags        []payloads.Tag `gorm:"many2many:post_tags;" json:"tags,omitempty"`
 	Attachments []*media.Media `gorm:"polymorphic:Owner;polymorphicValue:post;constraint:OnDelete:CASCADE" json:"attachments,omitempty"`
 
-	Poll     *payloads.Poll          `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"poll,omitempty"`
-	Event    *payloads.Event         `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE" json:"event,omitempty"`
-	Location *global_shared.Location `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"location,omitempty"`
+	Poll  *payloads.Poll  `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"poll,omitempty"`
+	Event *payloads.Event `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE" json:"event,omitempty"`
+
+	Location *global_shared.Location `gorm:"polymorphic:Contentable;polymorphicValue:post;constraint:OnDelete:CASCADE;" json:"location,omitempty"`
 }
 
 func (Post) TableName() string {

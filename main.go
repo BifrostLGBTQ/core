@@ -64,6 +64,16 @@ func NewApp() (*App, error) {
 
 		}
 
+		err = db.Migrate(instance.DB)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		err = db.Seed(instance.DB)
+		if err != nil {
+			fmt.Println(err)
+		}
+
 	}
 
 	return instance, nil

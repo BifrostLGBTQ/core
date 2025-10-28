@@ -7,7 +7,6 @@ import (
 	"bifrost/models/post"
 	"bifrost/models/post/payloads"
 	"bifrost/models/post/utils"
-	"bifrost/models/shared"
 	global_shared "bifrost/models/shared"
 	"bifrost/models/user"
 	"bifrost/repositories"
@@ -37,6 +36,8 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 
 	type PostForm struct {
 		// Temel post bilgileri
+		Title    string   `form:"title"`
+		Summary  string   `form:"summary"`
 		Content  string   `form:"content"`
 		Audience string   `form:"audience"`
 		Hashtags []string `form:"hashtags[]"` // body[hashtags][0], body[hashtags][1]...
@@ -85,19 +86,18 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 		AuthorID:  author.ID,
 		Published: false,
 		Type:      post.PostTypeTimeline,
-		Title:     nil,
+		Title:     utils.MakeLocalizedString(defaultLanguage, postForm.Title),
 		Content:   utils.MakeLocalizedString(defaultLanguage, postForm.Content),
-		Summary:   nil,
+		Summary:   utils.MakeLocalizedString(defaultLanguage, postForm.Summary),
 		PublicID:  node.Generate().Int64(),
 	}
 
+	fmt.Println("newPost", newPost)
 	// Post DB'ye ekle
 	if err := tx.Create(newPost).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-
-	fmt.Println("postForm", postForm)
 
 	// Post media
 	fmt.Println("files", files)
@@ -144,22 +144,20 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 		newPost.Poll = poll
 	}
 
-	var locationPost *global_shared.Location // varsayılan olarak nil
-	var locationPoint *extensions.PostGISPoint
+	var locationPost *global_shared.Location = nil // varsayılan olarak nil
+	var locationPoint *extensions.PostGISPoint = nil
 
 	// location
-	if len(postForm.LocationAddress) > 0 {
 
-		if postForm.LocationLat != 0 && postForm.LocationLng != 0 {
-			locationPoint = &extensions.PostGISPoint{
-				Lat: postForm.LocationLat,
-				Lng: postForm.LocationLng,
-			}
+	if postForm.LocationLat != 0 && postForm.LocationLng != 0 {
+		locationPoint = &extensions.PostGISPoint{
+			Lat: postForm.LocationLat,
+			Lng: postForm.LocationLng,
 		}
 
 		locationPost = &global_shared.Location{
 			ID:              uuid.New(),
-			ContentableType: shared.LocationOwnerPost,
+			ContentableType: global_shared.LocationOwnerPost,
 			ContentableID:   newPost.ID,
 			Address:         &postForm.LocationAddress,
 			Latitude:        &postForm.LocationLat,
@@ -204,8 +202,8 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 
 		locationEvent := &global_shared.Location{
 			ID:              uuid.New(),
-			ContentableType: shared.LocationOwnerEvent,
-			ContentableID:   newPost.ID,
+			ContentableType: global_shared.LocationOwnerEvent,
+			ContentableID:   evt.ID,
 			Address:         &postForm.LocationAddress,
 			Latitude:        &postForm.LocationLat,
 			Longitude:       &postForm.LocationLng,
@@ -214,16 +212,14 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 			UpdatedAt:       time.Now(),
 		}
 
-		evt.Location = locationEvent
-		evt.LocationID = &locationEvent.ID
-		if err := tx.Save(evt).Error; err != nil {
+		if err := tx.Create(locationEvent).Error; err != nil {
 			tx.Rollback()
 			return nil, err
 		}
+		evt.Location = locationEvent
 		newPost.Event = evt
 	}
 
-	newPost.Location = locationPost
 	if err := tx.Save(newPost).Error; err != nil {
 		tx.Rollback()
 		return nil, err
@@ -235,7 +231,9 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 	}
 
 	fmt.Println("NEW POST", newPost.ID)
-	return newPost, nil
+
+	lastPost, _ := s.postRepo.GetPostByID(newPost.ID)
+	return lastPost, nil
 }
 
 func (s *PostService) GetPostByID(id uuid.UUID) (*post.Post, error) {

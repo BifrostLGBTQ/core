@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"bifrost/constants"
-	"bifrost/extensions"
 	global_shared "bifrost/models/shared"
 	"bifrost/models/user"
 	"errors"
@@ -28,10 +27,6 @@ func (r *UserRepository) TestUser() error {
 	user := user.User{
 		UserName:    "testUser",
 		DisplayName: "testUser",
-		LocationPoint: &extensions.PostGISPoint{
-			Lng: 83.96632795978059,
-			Lat: 28.2052577611216,
-		},
 	}
 
 	return r.db.Create(&user).Error
