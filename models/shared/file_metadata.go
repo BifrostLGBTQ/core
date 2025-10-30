@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,4 +23,35 @@ type FileMetadata struct {
 
 func (FileMetadata) TableName() string {
 	return "file_metadata"
+}
+
+func (f FileMetadata) MarshalJSON() ([]byte, error) {
+	type Alias FileMetadata
+
+	baseURL := os.Getenv("APP_BASE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:3001"
+	}
+
+	// StoragePath'ten "./" kısmını kaldır
+	cleanPath := f.StoragePath
+	if len(cleanPath) >= 2 && cleanPath[:2] == "./" {
+		cleanPath = cleanPath[1:] // sadece nokta kaldır, slash kalsın
+	}
+
+	// Eğer hala / ile başlıyorsa baseURL ekle
+	fullURL := cleanPath
+	if len(cleanPath) > 0 && cleanPath[0] == '/' {
+		fullURL = baseURL + cleanPath
+	} else {
+		fullURL = baseURL + "/" + cleanPath
+	}
+
+	return json.Marshal(&struct {
+		Alias
+		URL string `json:"url"`
+	}{
+		Alias: (Alias)(f),
+		URL:   fullURL,
+	})
 }

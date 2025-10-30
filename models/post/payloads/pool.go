@@ -17,7 +17,7 @@ type Poll struct {
 	ContentableID   uuid.UUID              `json:"contentable_id"`
 	ContentableType string                 `json:"contentable_type"`
 	Question        shared.LocalizedString `gorm:"type:jsonb" json:"question"`
-	Duration        int                    `gorm:"default:0" json:"duration"`
+	Duration        string                 `gorm:"default:0" json:"duration"`
 	CreatedAt       time.Time              `json:"created_at"`
 	UpdatedAt       time.Time              `json:"updated_at"`
 

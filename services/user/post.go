@@ -8,13 +8,16 @@ import (
 	"bifrost/models/post/payloads"
 	"bifrost/models/post/utils"
 	global_shared "bifrost/models/shared"
+
+	form "github.com/go-playground/form/v4"
+
 	"bifrost/models/user"
 	"bifrost/repositories"
+	"bifrost/types"
 	"fmt"
 	"mime/multipart"
 	"time"
 
-	form "github.com/go-playground/form/v4"
 	"github.com/google/uuid"
 )
 
@@ -34,17 +37,25 @@ func NewPostService(
 func (s *PostService) CreatePost(request map[string][]string, files []*multipart.FileHeader, author *user.User) (*post.Post, error) {
 	fmt.Println("POST_SERVICE:CreatePost")
 
+	type PollForm struct {
+		ID       string   `form:"id"`
+		Question string   `form:"question"`
+		Duration string   `form:"duration"`
+		Options  []string `form:"options"` // options[] → slice
+	}
+
+	//Dot Notation
+
 	type PostForm struct {
 		// Temel post bilgileri
+		ParentId string   `form:"parentPostId"`
 		Title    string   `form:"title"`
 		Summary  string   `form:"summary"`
 		Content  string   `form:"content"`
 		Audience string   `form:"audience"`
 		Hashtags []string `form:"hashtags[]"` // body[hashtags][0], body[hashtags][1]...
 
-		// Poll bilgileri
-		PollDuration int      `form:"poll[duration]"`
-		PollOptions  []string `form:"poll[options]"` // body[poll][options][0..n]
+		Polls []PollForm `form:"polls"`
 
 		// Event bilgileri
 		EventTitle       string `form:"event[title]"`
@@ -65,8 +76,6 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 		return nil, err
 	}
 
-	fmt.Println("REQUEST", postForm.Hashtags)
-
 	tx := s.postRepo.DB().Begin() // transaction başlat
 	defer func() {
 		if r := recover(); r != nil {
@@ -79,10 +88,24 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to create snowflake node: %w", err)
 	}
+	var parentUUID *uuid.UUID
+
+	if len(postForm.ParentId) > 0 {
+		parsed, err := uuid.Parse(postForm.ParentId)
+		if err != nil {
+			// Hata yönetimi: geçersiz UUID
+			fmt.Println("Invalid ParentId:", err)
+			// İster panic, ister return, ister loglayabilirsin
+			parentUUID = nil
+		} else {
+			parentUUID = &parsed
+		}
+	}
 
 	defaultLanguage := "en"
 	newPost := &post.Post{
 		ID:        uuid.New(),
+		ParentID:  parentUUID,
 		AuthorID:  author.ID,
 		Published: false,
 		Type:      post.PostTypeTimeline,
@@ -92,7 +115,6 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 		PublicID:  node.Generate().Int64(),
 	}
 
-	fmt.Println("newPost", newPost)
 	// Post DB'ye ekle
 	if err := tx.Create(newPost).Error; err != nil {
 		tx.Rollback()
@@ -100,7 +122,6 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 	}
 
 	// Post media
-	fmt.Println("files", files)
 
 	for _, f := range files {
 		mediaModel, err := s.mediaRepo.AddMedia(tx, newPost.ID, media.OwnerPost, media.RolePost, f)
@@ -111,23 +132,18 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 		newPost.Attachments = append(newPost.Attachments, mediaModel)
 	}
 
-	// Poll
-	hasPoll := len(postForm.PollOptions) > 0
-
-	if hasPoll {
-		fmt.Println("SAVE:POLL")
+	for _, pollInfo := range postForm.Polls {
 		poll := &payloads.Poll{
 			ID:              uuid.New(),
 			ContentableID:   newPost.ID,
 			ContentableType: payloads.ContentablePollPost,
-			Question:        *utils.MakeLocalizedString(defaultLanguage, "Pool Question"),
-			Duration:        postForm.PollDuration,
+			Question:        *utils.MakeLocalizedString(defaultLanguage, pollInfo.Question),
+			Duration:        pollInfo.Duration,
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 		}
 
-		for _, choiceLabel := range postForm.PollOptions {
-			fmt.Println("ANKET SECENEKLERI:", choiceLabel)
+		for _, choiceLabel := range pollInfo.Options {
 			poll.Choices = append(poll.Choices, payloads.PollChoice{
 				ID:        uuid.New(),
 				PollID:    poll.ID,
@@ -141,7 +157,7 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 			return nil, err
 		}
 
-		newPost.Poll = poll
+		newPost.Poll = append(newPost.Poll, poll)
 	}
 
 	var locationPost *global_shared.Location = nil // varsayılan olarak nil
@@ -242,4 +258,21 @@ func (s *PostService) GetPostByID(id uuid.UUID) (*post.Post, error) {
 		return nil, fmt.Errorf("GetPostByID error: %w", err)
 	}
 	return postData, nil
+}
+
+func (s *PostService) GetPostByPublicID(id int64) (*post.Post, error) {
+	postData, err := s.postRepo.GetPostByPublicID(id)
+	if err != nil {
+		return nil, fmt.Errorf("GetPostByID error: %w", err)
+	}
+	return postData, nil
+}
+
+func (s *PostService) GetTimeline(limit int, cursor *int64) (types.TimelineResult, error) {
+	// Repo fonksiyonunu çağırıyoruz
+	posts, err := s.postRepo.GetTimeline(limit, cursor)
+	if err != nil {
+		return types.TimelineResult{}, err
+	}
+	return posts, nil
 }

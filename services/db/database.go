@@ -71,11 +71,16 @@ func Migrate(db *gorm.DB) error {
 		&user_payloads.Fantasy{},
 		&user_payloads.FantasyTranslation{},
 
+		&user_payloads.Interest{},
+		&user_payloads.InterestItem{},
+
 		&user_payloads.SexualOrientation{},
 		&user_payloads.SexualOrientationTranslation{},
 
 		&user.User{},
 		&user_payloads.UserFantasy{},
+		&user_payloads.UserInterest{},
+
 		&user.Follow{},
 		&user.Like{},
 		&user.Block{},
@@ -141,7 +146,7 @@ func Seed(db *gorm.DB) error {
 
 	seed.SeedFantasies(db)
 	seed.SeedSexualOrientations(db)
-
+	seed.SeedInterests(db)
 	fmt.Println("Seed End")
 	return nil
 }

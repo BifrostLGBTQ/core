@@ -28,9 +28,15 @@ const (
 	// USER
 	CMD_USER_UPDATE_PROFILE = "user.update_profile"
 	CMD_USER_FETCH_PROFILE  = "user.fetch_profile"
+	CMD_USER_UPLOAD_AVATAR  = "user.upload_avatar"
+	CMD_USER_UPLOAD_COVER   = "user.upload_cover"
+	CMD_USER_UPLOAD_STORY   = "user.upload_story"
 
-	CMD_POST_CREATE = "post.create"
-	CMD_POST_GET    = "post.get"
+	CMD_POST_CREATE   = "post.create"
+	CMD_POST_UPDATE   = "post.update"
+	CMD_POST_DELETE   = "post.delete"
+	CMD_POST_FETCH    = "post.fetch"
+	CMD_POST_TIMELINE = "post.timeline"
 )
 
 /*

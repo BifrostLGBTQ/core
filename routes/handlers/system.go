@@ -9,19 +9,6 @@ import (
 )
 
 // TranslationMap map[string]Translation
-type TranslationMap map[string]FantasyTranslationResponse
-
-type FantasyTranslationResponse struct {
-	Label       string `json:"label"`
-	Description string `json:"description"`
-}
-
-// FantasyResponse tek fantezi objesi
-type FantasyResponse struct {
-	ID           string         `json:"id"`
-	Category     string         `json:"category"`
-	Translations TranslationMap `json:"translations"`
-}
 
 // CountryResponse tek ülke objesi
 type CountryResponse struct {
@@ -43,10 +30,12 @@ type OrientationData struct {
 
 // InitialData dönecek ana struct
 type InitialData struct {
-	Fantasies          map[string]FantasyResponse  `json:"fantasies"`
-	Countries          map[string]CountryResponse  `json:"countries"`
-	SexualOrientations []OrientationData           `json:"sexual_orientations"` // key -> {lang -> label}
-	Languages          map[string]LanguageResponse `json:"languages"`
+	Fantasies []payloads.Fantasy         `json:"fantasies"`
+	Countries map[string]CountryResponse `json:"countries"`
+	Interests []payloads.Interest        `json:"interests"`
+
+	SexualOrientations []payloads.SexualOrientation `json:"sexual_orientations"` // key -> {lang -> label}
+	Languages          map[string]LanguageResponse  `json:"languages"`
 
 	Status string `json:"status"`
 }
@@ -60,26 +49,10 @@ func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// 2. Fantezileri map formatına çevir
-		fantasyMap := make(map[string]FantasyResponse)
-		for _, f := range fantasies {
-			translations := make(TranslationMap)
-			for _, t := range f.Translations {
-				lang := t.Language
-				if lang == "" {
-					lang = "en" // default İngilizce
-				}
-				translations[lang] = FantasyTranslationResponse{
-					Label:       t.Label,
-					Description: t.Description,
-				}
-			}
-
-			fantasyMap[f.ID.String()] = FantasyResponse{
-				ID:           f.ID.String(),
-				Category:     f.Category,
-				Translations: translations,
-			}
+		var interests []payloads.Interest
+		if err := db.Preload("Items").Find(&interests).Error; err != nil {
+			http.Error(w, "Failed to fetch interests", http.StatusInternalServerError)
+			return
 		}
 
 		// 3. Ülkeleri çek
@@ -116,25 +89,12 @@ func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		var sexualOrientations []OrientationData
-		for _, o := range orientations { // DB’den gelen slice
-			translationMap := make(map[string]string)
-			for _, t := range o.Translations {
-				translationMap[t.Language] = t.Label
-			}
-
-			sexualOrientations = append(sexualOrientations, OrientationData{
-				Key:          o.Key,
-				ID:           o.ID.String(),
-				Translations: translationMap,
-			})
-		}
-
 		// 5. InitialData hazırla
 		initialData := InitialData{
-			Fantasies:          fantasyMap,
+			Fantasies:          fantasies,
 			Countries:          countries,
-			SexualOrientations: sexualOrientations,
+			Interests:          interests,
+			SexualOrientations: orientations,
 			Languages:          languages,
 			Status:             "ok",
 		}

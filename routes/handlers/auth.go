@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bifrost/constants"
+	"bifrost/middleware"
 	services "bifrost/services/user"
 	"bifrost/utils"
 	"fmt"
@@ -44,6 +45,60 @@ func HandleLogin(s *services.UserService) http.HandlerFunc {
 			utils.SendError(w, http.StatusBadRequest, constants.ErrInvalidInput)
 			return
 		}
+
+	}
+}
+
+func HandleUploadAvatar(s *services.UserService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			utils.SendError(w, http.StatusBadRequest, constants.ErrInvalidInput)
+			return
+		}
+
+		user, ok := middleware.GetAuthenticatedUser(r)
+		if !ok {
+			utils.SendError(w, http.StatusUnauthorized, constants.ErrUnauthorized)
+			return
+		}
+
+		fmt.Println("USER", user.ID)
+
+	}
+}
+
+func HandleUploadCover(s *services.UserService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			utils.SendError(w, http.StatusBadRequest, constants.ErrInvalidInput)
+			return
+		}
+
+		user, ok := middleware.GetAuthenticatedUser(r)
+		if !ok {
+			utils.SendError(w, http.StatusUnauthorized, constants.ErrUnauthorized)
+			return
+		}
+
+		fmt.Println("USER", user.ID)
+
+	}
+}
+
+func HandleUploadStory(s *services.UserService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			utils.SendError(w, http.StatusBadRequest, constants.ErrInvalidInput)
+			return
+		}
+
+		user, ok := middleware.GetAuthenticatedUser(r)
+		if !ok {
+			utils.SendError(w, http.StatusUnauthorized, constants.ErrUnauthorized)
+			return
+		}
+
+		fmt.Println("USER", user.ID)
 
 	}
 }

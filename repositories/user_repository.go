@@ -89,6 +89,7 @@ func (r *UserRepository) GetByID(userID uuid.UUID) (*user.User, error) {
 	err :=
 		r.db.
 			Preload("Fantasies.Fantasy.Translations").
+			Preload("Interests.InterestItem.Interest").
 			Preload("Avatar").
 			Preload("Cover").
 			Preload("SexualOrientation").

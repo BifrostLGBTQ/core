@@ -70,8 +70,8 @@ type Post struct {
 	Tags        []payloads.Tag `gorm:"many2many:post_tags;" json:"tags,omitempty"`
 	Attachments []*media.Media `gorm:"polymorphic:Owner;polymorphicValue:post;constraint:OnDelete:CASCADE" json:"attachments,omitempty"`
 
-	Poll  *payloads.Poll  `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"poll,omitempty"`
-	Event *payloads.Event `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE" json:"event,omitempty"`
+	Poll  []*payloads.Poll `gorm:"polymorphic:Contentable;constraint:OnDelete:CASCADE" json:"poll,omitempty"`
+	Event *payloads.Event  `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE" json:"event,omitempty"`
 
 	Location *global_shared.Location `gorm:"polymorphic:Contentable;polymorphicValue:post;constraint:OnDelete:CASCADE;" json:"location,omitempty"`
 }

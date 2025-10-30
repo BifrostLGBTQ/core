@@ -10,6 +10,7 @@ import (
 	"bifrost/repositories"
 	"errors"
 	"fmt"
+	"mime/multipart"
 	"time"
 
 	form "github.com/go-playground/form/v4"
@@ -206,4 +207,22 @@ func (s *UserService) Unfollow(followerID, followeeID string) error {
 	}
 
 	return nil
+}
+
+func (s *UserService) UpdateAvatar(file *multipart.FileHeader, author *user.User) (*user.User, error) {
+	//
+	fmt.Println("Upload AVATAR")
+	return nil, nil
+}
+
+func (s *UserService) UpdateCover(file *multipart.FileHeader, author *user.User) (*user.User, error) {
+	//
+	fmt.Println("Upload COVER")
+	return nil, nil
+}
+
+func (s *UserService) AddStory(file *multipart.FileHeader, author *user.User) (*user.User, error) {
+	//
+	fmt.Println("Upload COVER")
+	return nil, nil
 }

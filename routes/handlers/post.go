@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 )
@@ -76,5 +77,68 @@ func HandleGetByID(s *services.PostService) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(post)
+	}
+}
+
+func HandleGetByPublicID(s *services.PostService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			http.Error(w, "missing post id", http.StatusBadRequest)
+			return
+		}
+
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			http.Error(w, "invalid uuid", http.StatusBadRequest)
+			return
+		}
+
+		fmt.Println("%d", id)
+
+		post, err := s.GetPostByPublicID(12)
+		if err != nil {
+			http.Error(w, "failed to get post: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(post)
+	}
+}
+
+func HandleTimeline(s *services.PostService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Limit parametresi
+		limitStr := r.URL.Query().Get("limit")
+		limit := 10 // default
+		if limitStr != "" {
+			if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+				limit = l
+			}
+		}
+
+		// Cursor parametresi (PublicID)
+		var cursor *int64
+		cursorStr := r.URL.Query().Get("cursor")
+		if cursorStr != "" {
+			if c, err := strconv.ParseInt(cursorStr, 10, 64); err == nil {
+				cursor = &c
+			} else {
+				http.Error(w, "invalid cursor", http.StatusBadRequest)
+				return
+			}
+		}
+
+		// Timeline verisini çek
+		result, err := s.GetTimeline(limit, cursor)
+		if err != nil {
+			http.Error(w, "failed to get timeline: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// JSON olarak döndür
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(result)
 	}
 }

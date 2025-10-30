@@ -30,6 +30,11 @@ func NewRouter(db *gorm.DB) *Router {
 		db:     db,
 	}
 
+	r.mux.PathPrefix("/static/").
+		Handler(http.StripPrefix("/static/",
+			http.FileServer(http.Dir("./static")),
+		))
+
 	// repository ve service oluştur
 	userRepo := repositories.NewUserRepository(r.db)
 	mediaRepo := repositories.NewMediaRepository(r.db)
@@ -47,6 +52,24 @@ func NewRouter(db *gorm.DB) *Router {
 	r.action.Register(constants.CMD_AUTH_LOGIN, handlers.HandleLogin(userService))
 	r.action.Register(constants.CMD_AUTH_TEST, handlers.HandleTestUser(userService))
 
+	r.action.Register(
+		constants.CMD_USER_UPLOAD_AVATAR,
+		handlers.HandleUploadAvatar(userService), // handler
+		middleware.AuthMiddleware(userRepo),      // middleware
+	)
+
+	r.action.Register(
+		constants.CMD_USER_UPLOAD_COVER,
+		handlers.HandleUploadCover(userService), // handler
+		middleware.AuthMiddleware(userRepo),     // middleware
+	)
+
+	r.action.Register(
+		constants.CMD_USER_UPLOAD_STORY,
+		handlers.HandleUploadStory(userService), // handler
+		middleware.AuthMiddleware(userRepo),     // middleware
+	)
+
 	// POST
 	//	r.action.Register(constants.CMD_POST_CREATE, middleware.AuthMiddleware(userRepo) handlers.HandleCreate(postService))
 	r.action.Register(
@@ -54,7 +77,8 @@ func NewRouter(db *gorm.DB) *Router {
 		handlers.HandleCreate(postService),  // handler
 		middleware.AuthMiddleware(userRepo), // middleware
 	)
-	r.action.Register(constants.CMD_POST_GET, handlers.HandleGetByID(postService))
+	r.action.Register(constants.CMD_POST_FETCH, handlers.HandleGetByID(postService))
+	r.action.Register(constants.CMD_POST_TIMELINE, handlers.HandleTimeline(postService))
 
 	r.mux.HandleFunc("/", r.handlePacket)
 	r.mux.HandleFunc("/test", r.handlePacket)

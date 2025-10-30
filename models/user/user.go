@@ -175,16 +175,18 @@ type User struct {
 
 	// Hobi ve Eğlence alanları (liste şeklinde)
 
-	Languages     pq.StringArray          `gorm:"type:text[]" json:"languages"`
-	Hobbies       pq.StringArray          `gorm:"type:text[]" json:"hobbies,omitempty"`
-	MoviesGenres  pq.StringArray          `gorm:"type:text[]" json:"movies_genres,omitempty"`
-	TVShowsGenres pq.StringArray          `gorm:"type:text[]" json:"tv_shows_genres,omitempty"`
-	TheaterGenres pq.StringArray          `gorm:"type:text[]" json:"theater_genres,omitempty"`
-	CinemaGenres  pq.StringArray          `gorm:"type:text[]" json:"cinema_genres,omitempty"`
-	ArtInterests  pq.StringArray          `gorm:"type:text[]" json:"art_interests,omitempty"`
-	Entertainment pq.StringArray          `gorm:"type:text[]" json:"entertainment,omitempty"`
-	Fantasies     []*payloads.UserFantasy `gorm:"foreignKey:UserID" json:"fantasies,omitempty"`
-	Travel        TravelData              `gorm:"embedded;embeddedPrefix:travel_" json:"travel"`
+	Languages     pq.StringArray           `gorm:"type:text[]" json:"languages"`
+	Hobbies       pq.StringArray           `gorm:"type:text[]" json:"hobbies,omitempty"`
+	MoviesGenres  pq.StringArray           `gorm:"type:text[]" json:"movies_genres,omitempty"`
+	TVShowsGenres pq.StringArray           `gorm:"type:text[]" json:"tv_shows_genres,omitempty"`
+	TheaterGenres pq.StringArray           `gorm:"type:text[]" json:"theater_genres,omitempty"`
+	CinemaGenres  pq.StringArray           `gorm:"type:text[]" json:"cinema_genres,omitempty"`
+	ArtInterests  pq.StringArray           `gorm:"type:text[]" json:"art_interests,omitempty"`
+	Entertainment pq.StringArray           `gorm:"type:text[]" json:"entertainment,omitempty"`
+	Fantasies     []*payloads.UserFantasy  `gorm:"foreignKey:UserID" json:"fantasies,omitempty"`
+	Interests     []*payloads.UserInterest `gorm:"foreignKey:UserID" json:"interests,omitempty"`
+
+	Travel TravelData `gorm:"embedded;embeddedPrefix:travel_" json:"travel"`
 	//  Sosyal İlişkiler
 	SocialRelations SocialRelations `json:"social,omitempty" gorm:"embedded;embeddedPrefix:social_"`
 	Media           []*media.Media  `gorm:"polymorphic:Owner;polymorphicValue:user;constraint:OnDelete:CASCADE" json:"media,omitempty"`

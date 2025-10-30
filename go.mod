@@ -27,6 +27,7 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/paulmach/orb v0.12.0 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
 	github.com/smartystreets/goconvey v1.8.1 // indirect
