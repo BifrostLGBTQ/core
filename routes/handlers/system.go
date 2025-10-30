@@ -3,6 +3,7 @@ package handlers
 import (
 	"bifrost/models/user/payloads"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"gorm.io/gorm"
@@ -28,11 +29,17 @@ type OrientationData struct {
 	Translations map[string]string `json:"translations"`
 }
 
+type GroupedAttributes struct {
+	Category   string          `json:"category"`
+	Attributes json.RawMessage `json:"attributes"` // JSON array olarak döner
+}
+
 // InitialData dönecek ana struct
 type InitialData struct {
-	Fantasies []payloads.Fantasy         `json:"fantasies"`
-	Countries map[string]CountryResponse `json:"countries"`
-	Interests []payloads.Interest        `json:"interests"`
+	Fantasies  []payloads.Fantasy         `json:"fantasies"`
+	Countries  map[string]CountryResponse `json:"countries"`
+	Interests  []payloads.Interest        `json:"interests"`
+	Attributes []GroupedAttributes        `json:"attributes"` // key -> {lang -> label}
 
 	SexualOrientations []payloads.SexualOrientation `json:"sexual_orientations"` // key -> {lang -> label}
 	Languages          map[string]LanguageResponse  `json:"languages"`
@@ -53,6 +60,27 @@ func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 		if err := db.Preload("Items").Find(&interests).Error; err != nil {
 			http.Error(w, "Failed to fetch interests", http.StatusInternalServerError)
 			return
+		}
+
+		var attributes []GroupedAttributes
+
+		err := db.Model(&payloads.Attribute{}).
+			Select(`
+			category,
+			json_agg(
+				jsonb_build_object(
+					'id', id,
+					'display_order', display_order,
+					'name', name
+				) ORDER BY display_order
+			) AS attributes
+		`).
+			Group("category").
+			Order("category ASC").
+			Scan(&attributes).Error
+
+		if err != nil {
+			log.Fatalf("query error: %v", err)
 		}
 
 		// 3. Ülkeleri çek
@@ -95,6 +123,7 @@ func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 			Countries:          countries,
 			Interests:          interests,
 			SexualOrientations: orientations,
+			Attributes:         attributes,
 			Languages:          languages,
 			Status:             "ok",
 		}

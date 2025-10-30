@@ -146,6 +146,7 @@ type User struct {
 	Bio                 *string                      `json:"bio,omitempty"`
 	DateOfBirth         *time.Time                   `json:"date_of_birth,omitempty"`
 	Gender              constants.GenderIdentity     `json:"gender"`
+	UserAttributes      []*payloads.UserAttribute    `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user_attributes,omitempty"`
 	SexualOrientation   *payloads.SexualOrientation  `gorm:"foreignKey:SexualOrientationID" json:"sexual_orientation"`
 	SexualOrientationID *uuid.UUID                   `gorm:"type:uuid;index" json:"-"`
 	RoleInSex           constants.SexRole            `json:"sex_role"`
@@ -168,12 +169,6 @@ type User struct {
 	// BDSM
 	BDSMInterest constants.BDSMInterest `json:"bdsm_interest,omitempty"`
 	BDSMRole     constants.BDSMRole     `json:"bdsm_role,omitempty"`
-
-	// Alkol ve Sigara kullanımı
-	Smoking  constants.SmokingHabit  `json:"smoking,omitempty"`
-	Drinking constants.DrinkingHabit `json:"drinking,omitempty"`
-
-	// Hobi ve Eğlence alanları (liste şeklinde)
 
 	Languages     pq.StringArray           `gorm:"type:text[]" json:"languages"`
 	Hobbies       pq.StringArray           `gorm:"type:text[]" json:"hobbies,omitempty"`
