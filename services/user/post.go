@@ -276,3 +276,11 @@ func (s *PostService) GetTimeline(limit int, cursor *int64) (types.TimelineResul
 	}
 	return posts, nil
 }
+
+func (s *PostService) GetPostsByUserID(id uuid.UUID, limit int, cursor *int64) ([]*post.Post, error) {
+	_, err := s.postRepo.GetUserPosts(id, cursor, limit)
+	if err != nil {
+		return nil, fmt.Errorf("GetPostByID error: %w", err)
+	}
+	return nil, nil
+}

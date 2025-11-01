@@ -146,6 +146,8 @@ func (r *PostRepository) GetPostByID(id uuid.UUID) (*post.Post, error) {
 		Preload("Event.Location").
 		Preload("Event.Attendees").
 		Preload("Author").
+		Preload("Author.Cover").
+		Preload("Author.Avatar").
 		Preload("Tags").
 		Preload("Attachments").
 		Preload("Attachments.File").
@@ -243,7 +245,9 @@ func (r *PostRepository) GetTimeline(limit int, cursor *int64) (types.TimelineRe
 		Preload("Event").
 		Preload("Event.Location").
 		Preload("Event.Attendees").
-		Preload("Author.SexualOrientation").
+		Preload("Author.GenderIdentities").
+		Preload("Author.SexualOrientations").
+		Preload("Author.SexualRole").
 		Preload("Author.Avatar").
 		Preload("Author.Cover").
 		Preload("Author.Fantasies").
@@ -268,4 +272,68 @@ func (r *PostRepository) GetTimeline(limit int, cursor *int64) (types.TimelineRe
 		Posts:      posts,
 		NextCursor: nextCursor,
 	}, nil
+}
+
+func (r *PostRepository) GetUserPosts(userID uuid.UUID, cursor *int64, limit int) ([]post.Post, error) {
+	var posts []post.Post
+
+	query := r.db.
+		Preload("Location").
+		Preload("Poll").
+		Preload("Poll.Choices").
+		Preload("Event").
+		Preload("Event.Location").
+		Preload("Event.Attendees").
+		Preload("Author").
+		Preload("Author.Cover").
+		Preload("Author.Avatar").
+		Preload("Tags").
+		Preload("Attachments").
+		Preload("Attachments.File").
+		Where("author_id = ? AND parent_id IS NULL", userID).
+		Order("created_at DESC").
+		Limit(limit)
+
+	// Eğer cursor verilmişse, sadece daha önceki postları al
+	if cursor != nil {
+		query = query.Where("created_at < ?", *cursor)
+	}
+
+	if err := query.Find(&posts).Error; err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func (r *PostRepository) GetUserPostReplies(userID uuid.UUID, cursor *int64, limit int) ([]post.Post, error) {
+	var posts []post.Post
+
+	query := r.db.
+		Preload("Location").
+		Preload("Poll").
+		Preload("Poll.Choices").
+		Preload("Event").
+		Preload("Event.Location").
+		Preload("Event.Attendees").
+		Preload("Author").
+		Preload("Author.Cover").
+		Preload("Author.Avatar").
+		Preload("Tags").
+		Preload("Attachments").
+		Preload("Attachments.File").
+		Where("author_id = ? AND parent_id IS NOT NULL", userID).
+		Order("created_at DESC").
+		Limit(limit)
+
+	// Cursor varsa sadece daha eski postlar
+	if cursor != nil {
+		query = query.Where("created_at < ?", *cursor)
+	}
+
+	if err := query.Find(&posts).Error; err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }

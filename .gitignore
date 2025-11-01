@@ -2,3 +2,5 @@
 /.env
 /static/posts/
 static/posts
+/static/users/
+static/users

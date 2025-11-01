@@ -52,6 +52,37 @@ func NewRouter(db *gorm.DB) *Router {
 	r.action.Register(constants.CMD_AUTH_LOGIN, handlers.HandleLogin(userService))
 	r.action.Register(constants.CMD_AUTH_TEST, handlers.HandleTestUser(userService))
 
+	r.action.Register( // access token'a gore user bilgisi
+		constants.CMD_AUTH_USER_INFO,
+		handlers.HandleUserInfo(userService),
+		middleware.AuthMiddleware(userRepo), // middleware
+	)
+
+	r.action.Register( // access token'a gore user attributes guncelleme
+		constants.CMD_USER_UPDATE_ATTRIBUTE,
+		handlers.HandleSetUserAttribute(userService),
+		middleware.AuthMiddleware(userRepo), // middleware
+
+	)
+
+	r.action.Register( // access token'a gore user interestlerini guncelleme
+		constants.CMD_USER_UPDATE_INTEREST,
+		handlers.HandleSetUserInterests(userService),
+		middleware.AuthMiddleware(userRepo), // middleware
+	)
+
+	r.action.Register( // access token'a gore user fantasylerini guncelleme
+		constants.CMD_USER_UPDATE_FANTASY,
+		handlers.HandleSetUserFantasies(userService),
+		middleware.AuthMiddleware(userRepo), // middleware
+	)
+
+	r.action.Register( // access token'a gore user sexual identity guncelleme
+		constants.CMD_USER_UPDATE_IDENTIFY,
+		handlers.HandleSetUserSexualIdentities(userService),
+		middleware.AuthMiddleware(userRepo), // middleware
+	)
+
 	r.action.Register(
 		constants.CMD_USER_UPLOAD_AVATAR,
 		handlers.HandleUploadAvatar(userService), // handler
@@ -66,6 +97,24 @@ func NewRouter(db *gorm.DB) *Router {
 
 	r.action.Register(
 		constants.CMD_USER_UPLOAD_STORY,
+		handlers.HandleUploadStory(userService), // handler
+		middleware.AuthMiddleware(userRepo),     // middleware
+	)
+
+	r.action.Register(
+		constants.CMD_USER_POSTS,
+		handlers.HandleUploadStory(userService), // handler
+		middleware.AuthMiddleware(userRepo),     // middleware
+	)
+
+	r.action.Register(
+		constants.CMD_USER_POST_REPLIES,
+		handlers.HandleUploadStory(userService), // handler
+		middleware.AuthMiddleware(userRepo),     // middleware
+	)
+
+	r.action.Register(
+		constants.CMD_USER_POST_MEDIA,
 		handlers.HandleUploadStory(userService), // handler
 		middleware.AuthMiddleware(userRepo),     // middleware
 	)

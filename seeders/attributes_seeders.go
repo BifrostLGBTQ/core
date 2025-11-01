@@ -85,6 +85,12 @@ func SeedAttributes(db *gorm.DB) error {
 		{ID: uuid.New(), Category: payloads.UserAttributeZodiac, Name: shared.LocalizedString{"en": "Pisces", "tr": "Balık"}},
 	}
 
+	var CircumcisionStatus = []payloads.Attribute{
+		{ID: uuid.New(), Category: payloads.UserAttributeCircumcision, Name: shared.LocalizedString{"en": "Circumcised", "tr": "Sünnetli"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeCircumcision, Name: shared.LocalizedString{"en": "Uncircumcised", "tr": "Sünnetsiz"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeCircumcision, Name: shared.LocalizedString{"en": "Other", "tr": "Diğer"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeCircumcision, Name: shared.LocalizedString{"en": "I’d rather not say", "tr": "Belirtmek istemiyorum"}},
+	}
 	var Disabilities = []payloads.Attribute{
 		{ID: uuid.New(), Category: payloads.UserAttributePhysicalDisability, Name: shared.LocalizedString{"en": "Blind", "tr": "Kör"}},
 		{ID: uuid.New(), Category: payloads.UserAttributePhysicalDisability, Name: shared.LocalizedString{"en": "Low vision", "tr": "Az görme"}},
@@ -116,6 +122,16 @@ func SeedAttributes(db *gorm.DB) error {
 		{ID: uuid.New(), Category: payloads.UserAttributeDrinking, Name: shared.LocalizedString{"en": "I’d rather not say", "tr": "Belirtmek istemiyorum"}},
 	}
 
+	var DietaryPreferences = []payloads.Attribute{
+		{ID: uuid.New(), Category: payloads.UserAttributeDietary, Name: shared.LocalizedString{"en": "Vegetarian", "tr": "Vejetaryen"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeDietary, Name: shared.LocalizedString{"en": "Vegan", "tr": "Vegan"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeDietary, Name: shared.LocalizedString{"en": "Pescatarian", "tr": "Balıkçılar"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeDietary, Name: shared.LocalizedString{"en": "Omnivore", "tr": "Her şeyi yiyen"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeDietary, Name: shared.LocalizedString{"en": "Keto", "tr": "Ketojenik"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeDietary, Name: shared.LocalizedString{"en": "Other", "tr": "Diğer"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeDrinking, Name: shared.LocalizedString{"en": "I’d rather not say", "tr": "Belirtmek istemiyorum"}},
+	}
+
 	var HeightAttributes []payloads.Attribute
 	for h := 140; h <= 210; h++ {
 		HeightAttributes = append(HeightAttributes, payloads.Attribute{
@@ -142,14 +158,19 @@ func SeedAttributes(db *gorm.DB) error {
 
 	var RelationshipStatuses = []payloads.Attribute{
 		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "Single", "tr": "Bekar"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "In a Relationship", "tr": "İlişkide"}},
 		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "Married", "tr": "Evli"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "Partnership", "tr": "Ortaklık"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "In Between", "tr": "Arada"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "I don't know", "tr": "Bilmiyorum"}},
 		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "Divorced", "tr": "Boşanmış"}},
 		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "Widowed", "tr": "Dul"}},
-		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "It’s complicated", "tr": "Karmaşık"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "Separated", "tr": "Ayrı"}},
 		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "Open", "tr": "Açık"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "Engaged", "tr": "Nişanlı"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "It’s complicated", "tr": "Karmaşık"}},
 		{ID: uuid.New(), Category: payloads.UserAttributeRelationshipStatus, Name: shared.LocalizedString{"en": "I’d rather not say", "tr": "Belirtmek istemiyorum"}},
 	}
-
 	var KidsPreferences = []payloads.Attribute{
 		{ID: uuid.New(), Category: payloads.UserAttributeKidsPreference, Name: shared.LocalizedString{"en": "I’d like them someday", "tr": "Bir gün isterim"}},
 		{ID: uuid.New(), Category: payloads.UserAttributeKidsPreference, Name: shared.LocalizedString{"en": "I’d like them soon", "tr": "Yakında isterim"}},
@@ -207,7 +228,88 @@ func SeedAttributes(db *gorm.DB) error {
 		{ID: uuid.New(), Category: payloads.UserAttributeReligion, Name: shared.LocalizedString{"en": "I’d rather not say", "tr": "Belirtmek istemiyorum"}},
 	}
 
-	allAttributes := [][]payloads.Attribute{HeightAttributes, WeightAttributes, HairColors, EyeColors, SkinColors, BodyTypes, Ethnicities, Zodiacs, RelationshipStatuses, KidsPreferences, EducationLevels, Religions, Disabilities, Pets, Smoking, Drinking}
+	var HIVAIDSStatuses = []payloads.Attribute{
+		// Temel durumlar
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "Negative", "tr": "Negatif"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "Positive", "tr": "Pozitif"}},
+		// Detaylı varyasyonlar
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "Undetectable (U=U)", "tr": "Tespit Edilemez (U=U)"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "On treatment (ART)", "tr": "Tedavi altında (ART)"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "Living with AIDS", "tr": "AIDS ile yaşıyor"}},
+		// Korunma durumları
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "On PrEP (Pre-exposure prophylaxis)", "tr": "PrEP kullanıyor (Koruyucu ilaç)"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "On PEP (Post-exposure prophylaxis)", "tr": "PEP kullanıyor (Maruziyet sonrası koruma)"}},
+		// Bilinmez veya test edilmemiş durumlar
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "Never tested", "tr": "Hiç test yaptırmadı"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "Recently tested negative", "tr": "Yakın zamanda negatif test sonucu aldı"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "Status unknown", "tr": "Durumu bilinmiyor"}},
+
+		// Gizlilik tercihi
+		{ID: uuid.New(), Category: payloads.UserAttributeHIVAIDS, Name: shared.LocalizedString{"en": "Prefer not to say", "tr": "Belirtmek istemiyorum"}},
+	}
+
+	var Personalities = []payloads.Attribute{
+		{
+			ID:       uuid.New(),
+			Category: payloads.UserAttributePersonality,
+			Name:     shared.LocalizedString{"en": "Introvert", "tr": "İçe dönük"},
+		},
+		{
+			ID:       uuid.New(),
+			Category: payloads.UserAttributePersonality,
+			Name:     shared.LocalizedString{"en": "Extrovert", "tr": "Dışa dönük"},
+		},
+		{
+			ID:       uuid.New(),
+			Category: payloads.UserAttributePersonality,
+			Name:     shared.LocalizedString{"en": "Somewhere in between", "tr": "Arada bir"},
+		},
+		{
+			ID:       uuid.New(),
+			Category: payloads.UserAttributePersonality,
+			Name:     shared.LocalizedString{"en": "I’d rather not say", "tr": "Belirtmek istemiyorum"},
+		},
+	}
+
+	var BDSMInterests = []payloads.Attribute{
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMInterest, Name: shared.LocalizedString{"en": "Yes", "tr": "Evet"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMInterest, Name: shared.LocalizedString{"en": "No", "tr": "Hayır"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMInterest, Name: shared.LocalizedString{"en": "Curious", "tr": "Meraklı"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMInterest, Name: shared.LocalizedString{"en": "Experienced", "tr": "Deneyimli"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMInterest, Name: shared.LocalizedString{"en": "Other", "tr": "Diğer"}},
+	}
+	var BDSMRoleAttributes = []payloads.Attribute{
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Dominant", "tr": "Hakim"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Submissive", "tr": "Teslimiyetçi"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Switch", "tr": "Değişken"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Top", "tr": "Aktif"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Bottom", "tr": "Pasif"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Verse", "tr": "Çift yönlü"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Side", "tr": "Yan rol"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Vers-top", "tr": "Çift yönlü - Top ağırlıklı"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Vers-bottom", "tr": "Çift yönlü - Bottom ağırlıklı"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Service Top", "tr": "Hizmetçi Top"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Service Bottom", "tr": "Hizmetçi Bottom"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Brat", "tr": "İtaatsiz/Şımarık"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Observer", "tr": "İzleyici"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMRoles, Name: shared.LocalizedString{"en": "Exhibitionist", "tr": "Gösterişçi"}},
+	}
+
+	var BDSMPlayAttributes = []payloads.Attribute{
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Bondage", "tr": "Bağlama"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Discipline", "tr": "Disiplin"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Sadism", "tr": "Sadizm"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Masochism", "tr": "Mazohizm"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Role Play", "tr": "Rol yapma"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Impact Play", "tr": "Fiziksel oyun"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Sensory Play", "tr": "Duyu oyunları"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Pet Play", "tr": "Evcil hayvan oyunu"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Edge Play", "tr": "Riskli oyun"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "Other", "tr": "Diğer"}},
+		{ID: uuid.New(), Category: payloads.UserAttributeBDSMPlays, Name: shared.LocalizedString{"en": "I’d rather not say", "tr": "Belirtmek istemiyorum"}},
+	}
+
+	allAttributes := [][]payloads.Attribute{HeightAttributes, WeightAttributes, HairColors, EyeColors, SkinColors, BodyTypes, Ethnicities, Zodiacs, RelationshipStatuses, KidsPreferences, EducationLevels, Religions, CircumcisionStatus, Disabilities, Pets, Smoking, Drinking, DietaryPreferences, HIVAIDSStatuses, Personalities, BDSMInterests, BDSMRoleAttributes, BDSMPlayAttributes}
 
 	for _, attrs := range allAttributes {
 		for index, attr := range attrs {

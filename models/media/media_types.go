@@ -5,8 +5,11 @@ type OwnerType string
 
 const (
 	// Role
-	RoleProfile   MediaRole = "profile"
-	RoleCover     MediaRole = "cover"
+	RoleProfile MediaRole = "profile"
+	RoleAvatar  MediaRole = "avatar"
+	RoleCover   MediaRole = "cover"
+	RoleStory   MediaRole = "story"
+
 	RolePost      MediaRole = "post"
 	RoleBlog      MediaRole = "blog"
 	RoleChatImage MediaRole = "chat_image"

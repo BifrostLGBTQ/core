@@ -142,3 +142,123 @@ func HandleTimeline(s *services.PostService) http.HandlerFunc {
 		json.NewEncoder(w).Encode(result)
 	}
 }
+
+func HandleGetPostsByUserID(s *services.PostService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			http.Error(w, "missing post id", http.StatusBadRequest)
+			return
+		}
+
+		userId, err := uuid.Parse(idStr)
+		if err != nil {
+			http.Error(w, "invalid uuid", http.StatusBadRequest)
+			return
+		}
+
+		limitStr := r.URL.Query().Get("limit")
+		limit := 10 // default
+		if limitStr != "" {
+			if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+				limit = l
+			}
+		}
+
+		// Cursor parametresi (PublicID)
+		var cursor *int64
+		cursorStr := r.URL.Query().Get("cursor")
+		if cursorStr != "" {
+			if c, err := strconv.ParseInt(cursorStr, 10, 64); err == nil {
+				cursor = &c
+			} else {
+				http.Error(w, "invalid cursor", http.StatusBadRequest)
+				return
+			}
+		}
+
+		post, err := s.GetPostsByUserID(userId, limit, cursor)
+		if err != nil {
+			http.Error(w, "failed to get post: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(post)
+	}
+}
+
+func HandleGetRepliesByUserID(s *services.PostService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			http.Error(w, "missing post id", http.StatusBadRequest)
+			return
+		}
+
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			http.Error(w, "invalid uuid", http.StatusBadRequest)
+			return
+		}
+
+		post, err := s.GetPostByID(id)
+		if err != nil {
+			http.Error(w, "failed to get post: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(post)
+	}
+}
+
+func HandleGetAllMediasByUserID(s *services.PostService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			http.Error(w, "missing post id", http.StatusBadRequest)
+			return
+		}
+
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			http.Error(w, "invalid uuid", http.StatusBadRequest)
+			return
+		}
+
+		post, err := s.GetPostByID(id)
+		if err != nil {
+			http.Error(w, "failed to get post: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(post)
+	}
+}
+
+func HandleGetAllLikesByUserID(s *services.PostService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			http.Error(w, "missing post id", http.StatusBadRequest)
+			return
+		}
+
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			http.Error(w, "invalid uuid", http.StatusBadRequest)
+			return
+		}
+
+		post, err := s.GetPostByID(id)
+		if err != nil {
+			http.Error(w, "failed to get post: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(post)
+	}
+}

@@ -4,6 +4,7 @@ import (
 	"bifrost/constants"
 	"bifrost/extensions"
 	"bifrost/helpers"
+	"bifrost/models/media"
 	global_shared "bifrost/models/shared"
 	"bifrost/models/user"
 	"bifrost/models/user/payloads"
@@ -18,7 +19,8 @@ import (
 )
 
 type UserService struct {
-	repo *repositories.UserRepository
+	repo      *repositories.UserRepository
+	mediaRepo *repositories.MediaRepository
 }
 
 func NewUserService(repo *repositories.UserRepository) *UserService {
@@ -29,14 +31,10 @@ func NewUserService(repo *repositories.UserRepository) *UserService {
 func (s *UserService) Register(request map[string][]string) (*user.User, string, error) {
 
 	type RegisterForm struct {
-		Name        string `form:"name"`
-		Nickname    string `form:"nickname"`
-		Password    string `form:"password"`
-		BirthDate   string `form:"birthDate"` // string veya time.Time
-		Orientation string `form:"orientation"`
-
-		// Fantasies array
-		Fantasies []string `form:"fantasies[]"`
+		Name      string `form:"name"`
+		Nickname  string `form:"nickname"`
+		Password  string `form:"password"`
+		BirthDate string `form:"birthDate"` // string veya time.Time
 
 		// Nested location
 		CountryCode string  `form:"location[country_code]"`
@@ -57,25 +55,11 @@ func (s *UserService) Register(request map[string][]string) (*user.User, string,
 		return nil, "", err
 	}
 
-	fmt.Println("DATA", formData)
-
-	fmt.Println("Orientation:BEGIN")
-	// Orientation
-	orientationKey := formData.Orientation
-	var orientation payloads.SexualOrientation
-	if err := s.repo.DB().Preload("Translations").
-		Where("id = ?", orientationKey).First(&orientation).Error; err != nil {
-		return nil, "", errors.New("invalid sexual orientation")
-	}
-	fmt.Println("Orientation:END")
-
 	// BirthDate
 	dateOfBirth, err := time.Parse("2006-01-02", formData.BirthDate)
 	if err != nil {
 		return nil, "", errors.New("invalid birthDate")
 	}
-
-	fmt.Println("ORIENTATION", orientationKey, "BITYH", dateOfBirth)
 
 	node, err := helpers.NewNode(1)
 	if err != nil {
@@ -113,13 +97,11 @@ func (s *UserService) Register(request map[string][]string) (*user.User, string,
 
 	userObj := &user.User{
 
-		ID:                  UserID,
-		PublicID:            node.Generate().Int64(),
-		UserName:            formData.Name,
-		DisplayName:         formData.Nickname,
-		DateOfBirth:         &dateOfBirth,
-		SexualOrientationID: &orientation.ID,
-		SexualOrientation:   &orientation,
+		ID:          UserID,
+		PublicID:    node.Generate().Int64(),
+		UserName:    formData.Name,
+		DisplayName: formData.Nickname,
+		DateOfBirth: &dateOfBirth,
 	}
 
 	if err := s.repo.Create(userObj); err != nil {
@@ -127,27 +109,6 @@ func (s *UserService) Register(request map[string][]string) (*user.User, string,
 	}
 
 	fmt.Println("INSERT:FANTASIES")
-
-	if len(formData.Fantasies) > 0 {
-		userFantasies := make([]*payloads.UserFantasy, len(formData.Fantasies))
-		for i, fID := range formData.Fantasies {
-
-			fantasyUUID, err := uuid.Parse(fID)
-			if err != nil {
-				fmt.Println("Skipping invalid fantasy ID:", fID)
-				continue
-			}
-			userFantasies[i] = &payloads.UserFantasy{
-				UserID:    userObj.ID,
-				FantasyID: fantasyUUID,
-			}
-		}
-
-		// Toplu insert
-		if err := s.repo.DB().Create(&userFantasies).Error; err != nil {
-			return nil, "", fmt.Errorf("failed to insert user fantasies: %w", err)
-		}
-	}
 
 	userInfo, err := s.GetUserByID(userObj.ID)
 	if err != nil {
@@ -209,20 +170,213 @@ func (s *UserService) Unfollow(followerID, followeeID string) error {
 	return nil
 }
 
-func (s *UserService) UpdateAvatar(file *multipart.FileHeader, author *user.User) (*user.User, error) {
-	//
-	fmt.Println("Upload AVATAR")
-	return nil, nil
+func (s *UserService) UpdateAvatar(file *multipart.FileHeader, user *user.User) (*media.Media, error) {
+	newMedia, err := s.mediaRepo.AddMedia(
+		s.repo.DB(),
+		user.ID,
+		media.OwnerUser,
+		media.RoleAvatar,
+		file,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload avatar: %w", err)
+	}
+
+	// User tablosunu güncelle
+	user.AvatarID = &newMedia.ID
+	user.Avatar = newMedia
+
+	if err := s.repo.UpdateUser(user); err != nil {
+		return nil, fmt.Errorf("failed to update user avatar: %w", err)
+	}
+	return newMedia, nil
 }
 
-func (s *UserService) UpdateCover(file *multipart.FileHeader, author *user.User) (*user.User, error) {
+func (s *UserService) UpdateCover(file *multipart.FileHeader, user *user.User) (*media.Media, error) {
+	//
+	newMedia, err := s.mediaRepo.AddMedia(
+		s.repo.DB(),
+		user.ID,
+		media.OwnerUser,
+		media.RoleAvatar,
+		file,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload avatar: %w", err)
+	}
+	user.CoverID = &newMedia.ID
+	user.Cover = newMedia
+
+	if err := s.repo.UpdateUser(user); err != nil {
+		return nil, fmt.Errorf("failed to update user avatar: %w", err)
+	}
+	return newMedia, nil
+}
+
+func (s *UserService) AddStory(file *multipart.FileHeader, user *user.User) (*payloads.Story, error) {
 	//
 	fmt.Println("Upload COVER")
 	return nil, nil
 }
 
-func (s *UserService) AddStory(file *multipart.FileHeader, author *user.User) (*user.User, error) {
-	//
-	fmt.Println("Upload COVER")
-	return nil, nil
+func (s *UserService) GetAttribute(attributeID uuid.UUID) (*payloads.Attribute, error) {
+	return s.repo.GetAttribute(attributeID)
+}
+
+func (s *UserService) GetInterestItem(interestId uuid.UUID) (*payloads.InterestItem, error) {
+	return s.repo.GetInterestItem(interestId)
+}
+
+// Kullanıcı ID ile getir
+func (s *UserService) GetFantasy(id uuid.UUID) (*payloads.Fantasy, error) {
+	return s.repo.GetFantasy(id)
+}
+
+func (s *UserService) UpsertUserSexualIdentify(
+	userID uuid.UUID,
+	genderIDs []string,
+	sexualIDs []string,
+	sexRoleIDs []string,
+) error {
+
+	// Kullanıcıyı repo'dan çekiyoruz (ilişkilerle birlikte)
+	user, err := s.repo.GetUserWithSexualRelations(userID)
+	if err != nil {
+		return err
+	}
+
+	// GenderIdentities güncelle
+	if genderIDs != nil {
+		if len(genderIDs) == 0 {
+			if err := s.repo.ClearGenderIdentities(user); err != nil {
+				return err
+			}
+		} else {
+			ids, err := parseUUIDs(genderIDs)
+			if err != nil {
+				return err
+			}
+			if err := s.repo.ReplaceGenderIdentities(user, ids); err != nil {
+				return err
+			}
+		}
+	}
+
+	// SexualOrientations güncelle
+	if sexualIDs != nil {
+		if len(sexualIDs) == 0 {
+			if err := s.repo.ClearSexualOrientations(user); err != nil {
+				return err
+			}
+		} else {
+			ids, err := parseUUIDs(sexualIDs)
+			if err != nil {
+				return err
+			}
+			if err := s.repo.ReplaceSexualOrientations(user, ids); err != nil {
+				return err
+			}
+		}
+	}
+
+	// SexRole güncelle (tek ilişki)
+	if sexRoleIDs != nil {
+		if len(sexRoleIDs) == 0 {
+			if err := s.repo.ClearSexRole(user); err != nil {
+				return err
+			}
+		} else {
+			id, err := uuid.Parse(sexRoleIDs[0])
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("SET ROLE SEX GHERE", user.DisplayName, id)
+			if err := s.repo.SetSexRole(user, id); err != nil {
+				fmt.Println("SET ROLE HATA OLDU GHERE", user.DisplayName)
+
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func parseUUIDs(strIDs []string) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
+	for _, strID := range strIDs {
+		id, err := uuid.Parse(strID)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
+func (s *UserService) UpsertUserAttribute(attr *payloads.UserAttribute) error {
+	if attr == nil {
+		return fmt.Errorf("attribute cannot be nil")
+	}
+
+	if attr.UserID == uuid.Nil {
+		return fmt.Errorf("user_id is required")
+	}
+
+	if attr.AttributeID == uuid.Nil {
+		return fmt.Errorf("attribute_id is required")
+	}
+
+	// Repository'yi çağır
+	err := s.repo.UpsertUserAttribute(attr)
+	if err != nil {
+		return fmt.Errorf("failed to upsert user attribute: %w", err)
+	}
+
+	return nil
+}
+
+func (s *UserService) UpsertUserInterest(interest *payloads.UserInterest) error {
+	if interest == nil {
+		return fmt.Errorf("attribute cannot be nil")
+	}
+
+	if interest.UserID == uuid.Nil {
+		return fmt.Errorf("user_id is required")
+	}
+
+	if interest.InterestItemID == uuid.Nil {
+		return fmt.Errorf("attribute_id is required")
+	}
+
+	// Repository'yi çağır
+	err := s.repo.ToggleUserInterest(interest)
+	if err != nil {
+		return fmt.Errorf("failed to upsert user attribute: %w", err)
+	}
+
+	return nil
+}
+
+func (s *UserService) UpsertUserFantasy(fantasy *payloads.UserFantasy) error {
+	if fantasy == nil {
+		return fmt.Errorf("fantasy cannot be nil")
+	}
+
+	if fantasy.UserID == uuid.Nil {
+		return fmt.Errorf("user_id is required")
+	}
+
+	if fantasy.FantasyID == uuid.Nil {
+		return fmt.Errorf("fantasy is required")
+	}
+
+	// Repository'yi çağır
+	err := s.repo.ToggleUserFantasy(fantasy)
+	if err != nil {
+		return fmt.Errorf("failed to upsert user attribute: %w", err)
+	}
+
+	return nil
 }

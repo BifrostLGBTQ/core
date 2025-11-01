@@ -135,28 +135,30 @@ type TravelPlan struct {
 }
 
 type User struct {
-	ID                  uuid.UUID                    `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	PublicID            int64                        `gorm:"uniqueIndex;not null" json:"public_id"`
-	SocketID            *string                      `json:"socket_id,omitempty"`
-	UserName            string                       `json:"username"`
-	DisplayName         string                       `json:"displayname"`
-	Email               string                       `json:"email"`
-	Password            string                       `json:"-"` // gizli tutulmalı
-	ProfileImageURL     *string                      `json:"profile_image_url,omitempty"`
-	Bio                 *string                      `json:"bio,omitempty"`
-	DateOfBirth         *time.Time                   `json:"date_of_birth,omitempty"`
-	Gender              constants.GenderIdentity     `json:"gender"`
-	UserAttributes      []*payloads.UserAttribute    `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user_attributes,omitempty"`
-	SexualOrientation   *payloads.SexualOrientation  `gorm:"foreignKey:SexualOrientationID" json:"sexual_orientation"`
-	SexualOrientationID *uuid.UUID                   `gorm:"type:uuid;index" json:"-"`
-	RoleInSex           constants.SexRole            `json:"sex_role"`
-	RelationshipStatus  constants.RelationshipStatus `json:"relationship_status"`
-	UserRole            constants.UserRole           `json:"user_role"`
-	IsActive            bool                         `json:"is_active"`
-	CreatedAt           time.Time                    `json:"created_at"`
-	UpdatedAt           time.Time                    `json:"updated_at"`
-	LastOnline          *time.Time                   `json:"last_online,omitempty"`
-	Location            *shared.Location             `gorm:"polymorphic:Contentable;polymorphicValue:user;constraint:OnDelete:CASCADE" json:"location,omitempty"`
+	ID              uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	PublicID        int64      `gorm:"uniqueIndex;not null" json:"public_id"`
+	SocketID        *string    `json:"socket_id,omitempty"`
+	UserName        string     `json:"username"`
+	DisplayName     string     `json:"displayname"`
+	Email           string     `json:"email"`
+	Password        string     `json:"-"` // gizli tutulmalı
+	ProfileImageURL *string    `json:"profile_image_url,omitempty"`
+	Bio             *string    `json:"bio,omitempty"`
+	DateOfBirth     *time.Time `json:"date_of_birth,omitempty"`
+
+	UserAttributes []*payloads.UserAttribute `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user_attributes,omitempty"`
+
+	GenderIdentities   []payloads.GenderIdentity    `gorm:"many2many:user_gender_identities;joinForeignKey:UserID;joinReferences:GenderIdentityID" json:"gender_identities"`
+	SexualOrientations []payloads.SexualOrientation `gorm:"many2many:user_sexual_orientations;joinForeignKey:UserID;joinReferences:SexualOrientationID" json:"sexual_orientations"`
+
+	SexualRoleID *uuid.UUID           `gorm:"type:uuid" json:"sexual_role_id,omitempty"`
+	SexualRole   *payloads.SexualRole `gorm:"foreignKey:SexualRoleID" json:"sexual_role,omitempty"`
+	UserRole     constants.UserRole   `json:"user_role"`
+	IsActive     bool                 `json:"is_active"`
+	CreatedAt    time.Time            `json:"created_at"`
+	UpdatedAt    time.Time            `json:"updated_at"`
+	LastOnline   *time.Time           `json:"last_online,omitempty"`
+	Location     *shared.Location     `gorm:"polymorphic:Contentable;polymorphicValue:user;constraint:OnDelete:CASCADE" json:"location,omitempty"`
 
 	DefaultLanguage string `gorm:"type:varchar(8);default:'en'" json:"default_language"`
 
@@ -165,10 +167,6 @@ type User struct {
 
 	CoverID *uuid.UUID   `json:"cover_id,omitempty"`
 	Cover   *media.Media `gorm:"constraint:OnDelete:SET NULL;foreignKey:CoverID;references:ID" json:"cover,omitempty"`
-
-	// BDSM
-	BDSMInterest constants.BDSMInterest `json:"bdsm_interest,omitempty"`
-	BDSMRole     constants.BDSMRole     `json:"bdsm_role,omitempty"`
 
 	Languages     pq.StringArray           `gorm:"type:text[]" json:"languages"`
 	Hobbies       pq.StringArray           `gorm:"type:text[]" json:"hobbies,omitempty"`

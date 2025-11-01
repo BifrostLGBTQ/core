@@ -41,17 +41,19 @@ type InitialData struct {
 	Interests  []payloads.Interest        `json:"interests"`
 	Attributes []GroupedAttributes        `json:"attributes"` // key -> {lang -> label}
 
-	SexualOrientations []payloads.SexualOrientation `json:"sexual_orientations"` // key -> {lang -> label}
-	Languages          map[string]LanguageResponse  `json:"languages"`
+	Languages map[string]LanguageResponse `json:"languages"`
 
-	Status string `json:"status"`
+	GenderIdentities   []payloads.GenderIdentity    `json:"gender_identities"`
+	SexualOrientations []payloads.SexualOrientation `json:"sexual_orientations"`
+	SexRoles           []payloads.SexualRole        `json:"sexual_roles"`
+	Status             string                       `json:"status"`
 }
 
 func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 1. Tüm fantezileri çek
 		var fantasies []payloads.Fantasy
-		if err := db.Preload("Translations").Find(&fantasies).Error; err != nil {
+		if err := db.Find(&fantasies).Error; err != nil {
 			http.Error(w, "Failed to fetch fantasies", http.StatusInternalServerError)
 			return
 		}
@@ -59,6 +61,28 @@ func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 		var interests []payloads.Interest
 		if err := db.Preload("Items").Find(&interests).Error; err != nil {
 			http.Error(w, "Failed to fetch interests", http.StatusInternalServerError)
+			return
+		}
+
+		var genderIdentities []payloads.GenderIdentity
+		var sexualOrientations []payloads.SexualOrientation
+		var sexRoles []payloads.SexualRole
+
+		// Gender Identities
+		if err := db.Find(&genderIdentities).Error; err != nil {
+			http.Error(w, "Failed to fetch gender identities", http.StatusInternalServerError)
+			return
+		}
+
+		// Sexual Orientations
+		if err := db.Find(&sexualOrientations).Error; err != nil {
+			http.Error(w, "Failed to fetch Sexual Orientations", http.StatusInternalServerError)
+			return
+		}
+
+		// Sex Roles
+		if err := db.Find(&sexRoles).Error; err != nil {
+			http.Error(w, "Failed to fetch sex roles", http.StatusInternalServerError)
 			return
 		}
 
@@ -111,20 +135,16 @@ func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 			"bn": {Code: "bn", Flag: "🇧🇩", Name: "বাংলা"},            // Bengalce
 		}
 
-		var orientations []payloads.SexualOrientation
-		if err := db.Preload("Translations").Find(&orientations).Error; err != nil {
-			http.Error(w, "Failed to fetch orientations", http.StatusInternalServerError)
-			return
-		}
-
 		// 5. InitialData hazırla
 		initialData := InitialData{
 			Fantasies:          fantasies,
 			Countries:          countries,
 			Interests:          interests,
-			SexualOrientations: orientations,
 			Attributes:         attributes,
 			Languages:          languages,
+			GenderIdentities:   genderIdentities,
+			SexualOrientations: sexualOrientations,
+			SexRoles:           sexRoles,
 			Status:             "ok",
 		}
 
