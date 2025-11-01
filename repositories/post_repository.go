@@ -15,15 +15,16 @@ import (
 )
 
 type PostRepository struct {
-	db *gorm.DB
+	db            *gorm.DB
+	snowFlakeNode *helpers.Node
 }
 
 func (r *PostRepository) DB() *gorm.DB {
 	return r.db
 }
 
-func NewPostRepository(db *gorm.DB) *PostRepository {
-	return &PostRepository{db: db}
+func NewPostRepository(db *gorm.DB, snowFlakeNode *helpers.Node) *PostRepository {
+	return &PostRepository{db: db, snowFlakeNode: snowFlakeNode}
 }
 
 func (r *PostRepository) CreatePost(post *post.Post) error {
@@ -33,11 +34,7 @@ func (r *PostRepository) CreatePost(post *post.Post) error {
 
 	// PublicID için Snowflake tarzı ID veya timestamp tabanlı basit artan ID
 	if post.PublicID == 0 {
-		node, err := helpers.NewNode(1)
-		if err != nil {
-			return fmt.Errorf("failed to create snowflake node: %w", err)
-		}
-		post.PublicID = node.Generate().Int64()
+		post.PublicID = r.snowFlakeNode.Generate().Int64()
 	}
 
 	// CreatedAt ve UpdatedAt

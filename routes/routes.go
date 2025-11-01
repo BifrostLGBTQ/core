@@ -3,6 +3,7 @@ package routes
 
 import (
 	"bifrost/constants"
+	"bifrost/helpers"
 	"bifrost/middleware"
 	"bifrost/repositories"
 	"bifrost/router"
@@ -18,16 +19,18 @@ import (
 )
 
 type Router struct {
-	mux    *mux.Router
-	action *router.ActionRouter
-	db     *gorm.DB
+	mux           *mux.Router
+	action        *router.ActionRouter
+	db            *gorm.DB
+	snowFlakeNode *helpers.Node
 }
 
-func NewRouter(db *gorm.DB) *Router {
+func NewRouter(db *gorm.DB, snowFlakeNode *helpers.Node) *Router {
 	r := &Router{
-		mux:    mux.NewRouter(),
-		action: router.NewActionRouter(db),
-		db:     db,
+		mux:           mux.NewRouter(),
+		action:        router.NewActionRouter(db),
+		db:            db,
+		snowFlakeNode: snowFlakeNode,
 	}
 
 	r.mux.PathPrefix("/static/").
@@ -36,9 +39,9 @@ func NewRouter(db *gorm.DB) *Router {
 		))
 
 	// repository ve service oluştur
-	userRepo := repositories.NewUserRepository(r.db)
+	userRepo := repositories.NewUserRepository(r.db, snowFlakeNode)
 	mediaRepo := repositories.NewMediaRepository(r.db)
-	postRepo := repositories.NewPostRepository(r.db)
+	postRepo := repositories.NewPostRepository(r.db, snowFlakeNode)
 
 	userService := services.NewUserService(userRepo)
 	postService := services.NewPostService(userRepo, postRepo, mediaRepo)

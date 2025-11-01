@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"bifrost/constants"
+	"bifrost/helpers"
 	global_shared "bifrost/models/shared"
 	userModel "bifrost/models/user"
 	"bifrost/models/user/payloads"
@@ -14,15 +15,20 @@ import (
 )
 
 type UserRepository struct {
-	db *gorm.DB
+	db            *gorm.DB
+	snowFlakeNode *helpers.Node
 }
 
 func (r *UserRepository) DB() *gorm.DB {
 	return r.db
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func (r *UserRepository) Node() *helpers.Node {
+	return r.snowFlakeNode
+}
+
+func NewUserRepository(db *gorm.DB, snowFlakeNode *helpers.Node) *UserRepository {
+	return &UserRepository{db: db, snowFlakeNode: snowFlakeNode}
 }
 
 func (r *UserRepository) TestUser() error {
@@ -32,6 +38,15 @@ func (r *UserRepository) TestUser() error {
 	}
 
 	return r.db.Create(&user).Error
+}
+
+func (r *UserRepository) GetByUserNameOrEmailOrNickname(input string) (*userModel.User, error) {
+	var userObj userModel.User
+	err := r.db.Where("user_name = ? OR email = ?", input, input).First(&userObj).Error
+	if err != nil {
+		return nil, err
+	}
+	return &userObj, nil
 }
 
 func (r *UserRepository) Create(user *userModel.User) error {
@@ -101,7 +116,7 @@ func (r *UserRepository) GetByID(userID uuid.UUID) (*userModel.User, error) {
 
 	err :=
 		r.db.
-			Preload("Fantasies.Fantasy.Translations").
+			Preload("Fantasies.Fantasy").
 			Preload("Interests.InterestItem.Interest").
 			Preload("Avatar.File").
 			Preload("Cover.File").
@@ -131,7 +146,7 @@ func (r *UserRepository) GetUserByPublicId(userID int64) (*userModel.User, error
 	var u userModel.User
 	err :=
 		r.db.
-			Preload("Fantasies.Fantasy.Translations").
+			Preload("Fantasies.Fantasy").
 			Preload("Avatar").
 			Preload("Cover").
 			Preload("Media").

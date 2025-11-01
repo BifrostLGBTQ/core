@@ -104,15 +104,16 @@ func (s *PostService) CreatePost(request map[string][]string, files []*multipart
 
 	defaultLanguage := "en"
 	newPost := &post.Post{
-		ID:        uuid.New(),
-		ParentID:  parentUUID,
-		AuthorID:  author.ID,
-		Published: false,
-		Type:      post.PostTypeTimeline,
-		Title:     utils.MakeLocalizedString(defaultLanguage, postForm.Title),
-		Content:   utils.MakeLocalizedString(defaultLanguage, postForm.Content),
-		Summary:   utils.MakeLocalizedString(defaultLanguage, postForm.Summary),
-		PublicID:  node.Generate().Int64(),
+		ID:              uuid.New(),
+		ParentID:        parentUUID,
+		AuthorID:        author.ID,
+		Published:       false,
+		PostKind:        post.PostTypeTimeline,
+		ContentCategory: post.ContentNormal,
+		Title:           utils.MakeLocalizedString(defaultLanguage, postForm.Title),
+		Content:         utils.MakeLocalizedString(defaultLanguage, postForm.Content),
+		Summary:         utils.MakeLocalizedString(defaultLanguage, postForm.Summary),
+		PublicID:        node.Generate().Int64(),
 	}
 
 	// Post DB'ye ekle

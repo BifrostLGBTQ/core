@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bifrost/helpers"
 	"bifrost/routes"
 	"bifrost/services/db"
 	"flag"
@@ -20,6 +21,8 @@ type App struct {
 	DB             *gorm.DB
 	Router         routes.AppHandler
 	SocketIOClient *socketcli.Client
+	SnowFlakeNode  *helpers.Node
+
 	//RedisClient         *_redis.Client
 }
 
@@ -34,11 +37,16 @@ func NewApp() (*App, error) {
 			fmt.Println(err)
 			return nil, err
 		}
+
+		snowFlakeNode, err := helpers.NewNode(1) // Node ID, genelde 0-1023 arası
+		if err != nil {
+			log.Fatalf("Failed to initialize snowflake node: %v", err)
+		}
+
 		instance = &App{
-			DB:     db.DB,
-			Router: routes.NewRouter(db.DB),
-			//WebSocketClientPool: ressocket.ConstructSocket(),
-			//RedisClient:         redis.ConstructRedis(),
+			DB:            db.DB,
+			Router:        routes.NewRouter(db.DB, snowFlakeNode),
+			SnowFlakeNode: snowFlakeNode,
 		}
 
 		migrateFlag := flag.Bool("migrate", false, "Run DB migrations")

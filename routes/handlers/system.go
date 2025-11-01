@@ -53,7 +53,7 @@ func HandleInitialSync(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 1. Tüm fantezileri çek
 		var fantasies []payloads.Fantasy
-		if err := db.Find(&fantasies).Error; err != nil {
+		if err := db.Order("display_order DESC").Find(&fantasies).Error; err != nil {
 			http.Error(w, "Failed to fetch fantasies", http.StatusInternalServerError)
 			return
 		}

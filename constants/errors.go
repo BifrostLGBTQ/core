@@ -20,6 +20,8 @@ const (
 	ErrMediaInvalidFile     ErrorCode = "MEDIA_INVALID_FILE"
 	ErrMediaUnsupportedType ErrorCode = "MEDIA_UNSUPPORTED_TYPE"
 	ErrMediaSaveFailed      ErrorCode = "MEDIA_SAVE_FAILED"
+
+	ErrUserExists ErrorCode = "USER_EXISTS"
 )
 
 var ErrorMessages = map[ErrorCode]string{
@@ -39,6 +41,7 @@ var ErrorMessages = map[ErrorCode]string{
 	ErrMediaInvalidFile:     "Invalid media file provided.",
 	ErrMediaUnsupportedType: "Unsupported media file type.",
 	ErrMediaSaveFailed:      "Failed to save media file.",
+	ErrUserExists:           "User already exists",
 }
 
 // String returns a readable message for the given error code.

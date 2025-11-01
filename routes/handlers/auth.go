@@ -31,7 +31,7 @@ func HandleRegister(s *services.UserService) http.HandlerFunc {
 		fmt.Println("REGISTER:FORM", form)
 		userObj, token, err := s.Register(form)
 		if err != nil {
-			utils.SendError(w, http.StatusBadRequest, constants.ErrDatabaseError)
+			utils.SendError(w, http.StatusBadRequest, constants.ErrUserExists)
 			return
 		}
 
@@ -49,6 +49,18 @@ func HandleLogin(s *services.UserService) http.HandlerFunc {
 			return
 		}
 
+		form := r.MultipartForm.Value
+
+		userObj, token, err := s.Login(form)
+		if err != nil {
+			utils.SendError(w, http.StatusUnauthorized, constants.ErrInvalidInput)
+			return
+		}
+
+		utils.SendJSON(w, http.StatusOK, map[string]interface{}{
+			"user":  userObj,
+			"token": token,
+		})
 	}
 }
 

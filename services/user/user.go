@@ -16,6 +16,7 @@ import (
 
 	form "github.com/go-playground/form/v4"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type UserService struct {
@@ -61,9 +62,19 @@ func (s *UserService) Register(request map[string][]string) (*user.User, string,
 		return nil, "", errors.New("invalid birthDate")
 	}
 
-	node, err := helpers.NewNode(1)
+	// Hashle
+	hash, err := helpers.HashPasswordArgon2id(formData.Password)
 	if err != nil {
-		return nil, "", fmt.Errorf("failed to create snowflake node: %w", err)
+		return nil, "", fmt.Errorf("failed to create hash password: %w", err)
+	}
+
+	existingUser, err := s.repo.GetByUserNameOrEmailOrNickname(formData.Nickname)
+	if err == nil && existingUser != nil {
+		return nil, "", errors.New("username already exists")
+	}
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		// başka bir hata varsa onu da döndür
+		return nil, "", err
 	}
 
 	locationPoint := &extensions.PostGISPoint{
@@ -98,10 +109,11 @@ func (s *UserService) Register(request map[string][]string) (*user.User, string,
 	userObj := &user.User{
 
 		ID:          UserID,
-		PublicID:    node.Generate().Int64(),
+		PublicID:    s.repo.Node().Generate().Int64(),
 		UserName:    formData.Name,
 		DisplayName: formData.Nickname,
 		DateOfBirth: &dateOfBirth,
+		Password:    hash,
 	}
 
 	if err := s.repo.Create(userObj); err != nil {
@@ -120,6 +132,43 @@ func (s *UserService) Register(request map[string][]string) (*user.User, string,
 	}
 
 	return userInfo, token, nil
+}
+
+func (s *UserService) Login(request map[string][]string) (*user.User, string, error) {
+	// Form yapısı
+	type LoginForm struct {
+		UserName string `form:"nickname"`
+		Password string `form:"password"`
+	}
+
+	decoder := form.NewDecoder()
+	var formData LoginForm
+
+	if err := decoder.Decode(&formData, request); err != nil {
+		return nil, "", err
+	}
+
+	// Kullanıcıyı username ile bul (repo'da buna uygun fonksiyon olmalı)
+	userObj, err := s.repo.GetByUserNameOrEmailOrNickname(formData.UserName)
+	if err != nil {
+		return nil, "", errors.New("invalid username/email/nickname or password")
+	}
+
+	ok, err := helpers.ComparePasswordArgon2id(userObj.Password, formData.Password)
+	if err != nil {
+		return nil, "", err // Karşılaştırma sırasında hata
+	}
+	if !ok {
+		return nil, "", errors.New("invalid credentials") // Şifre yanlış
+	}
+
+	// Token üret
+	token, err := helpers.GenerateUserJWT(userObj.ID, userObj.PublicID)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return userObj, token, nil
 }
 
 // Kullanıcı ID ile getir

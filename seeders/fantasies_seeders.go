@@ -67,7 +67,7 @@ func SeedFantasies(db *gorm.DB) error {
 		return fmt.Errorf("cannot decode JSON: %w", err)
 	}
 
-	for _, item := range data {
+	for index, item := range data {
 		labelLocalized := shared.LocalizedString(item.Label)
 		descriptionLocalized := shared.LocalizedString(item.Description)
 		var existing payloads.Fantasy
@@ -81,10 +81,11 @@ func SeedFantasies(db *gorm.DB) error {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				// Kayıt yok, yeni oluştur
 				fantasy := payloads.Fantasy{
-					Slug:        slug,
-					Category:    categoryPtr,
-					Label:       labelLocalized,
-					Description: descriptionLocalized,
+					DisplayOrder: index,
+					Slug:         slug,
+					Category:     categoryPtr,
+					Label:        labelLocalized,
+					Description:  descriptionLocalized,
 				}
 				if err := db.Create(&fantasy).Error; err != nil {
 					return fmt.Errorf("failed to insert fantasy: %w", err)
@@ -98,6 +99,7 @@ func SeedFantasies(db *gorm.DB) error {
 			existing.Description = descriptionLocalized
 			existing.Label = labelLocalized
 			existing.Category = categoryPtr
+			existing.DisplayOrder = index
 			// Category da güncellenmek istenirse buraya ekle
 
 			if err := db.Save(&existing).Error; err != nil {

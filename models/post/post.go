@@ -50,8 +50,13 @@ type Post struct {
 
 	PublicID int64 `gorm:"uniqueIndex;not null" json:"public_id"`
 
+	// 🔸 PostType alanının yeni ismi
+	PostKind PostType `gorm:"size:50;not null;index;default:'timeline'" json:"post_kind"`
+
+	// 🔹 İçerik kategorisi
+	ContentCategory ContentCategory `gorm:"size:50;not null;index;default:'normal'" json:"content_category"`
+
 	AuthorID uuid.UUID `gorm:"type:uuid;index;not null" json:"author_id"`
-	Type     PostType  `gorm:"size:50;not null;index" json:"type"`
 
 	Title   *shared.LocalizedString `gorm:"type:jsonb" json:"title,omitempty"`
 	Slug    *string                 `gorm:"size:255;uniqueIndex" json:"slug,omitempty"`
